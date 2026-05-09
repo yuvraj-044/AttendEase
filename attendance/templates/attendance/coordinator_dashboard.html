@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Coordinator Dashboard — AttendEAse{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1 class="dashboard-title">Coordinator Dashboard</h1>
+        <p class="dashboard-subtitle">Review and manage student attendance requests</p>
+    </div>
+    <a href="{% url 'events:event_create' %}" class="btn btn-primary btn-glow" id="createEventBtn">
+        <i class="bi bi-plus-lg me-2"></i>Create Event
+    </a>
+</div>
+
+<!-- ── Stat Cards ── -->
+<div class="row g-4 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="stat-card stat-pending">
+            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-value" data-count="{{ stats.pending }}">{{ stats.pending }}</div>
+            <div class="stat-label">Pending Review</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card stat-approved">
+            <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
+            <div class="stat-value" data-count="{{ stats.approved }}">{{ stats.approved }}</div>
+            <div class="stat-label">Approved</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card stat-rejected">
+            <div class="stat-icon"><i class="bi bi-x-circle-fill"></i></div>
+            <div class="stat-value" data-count="{{ stats.rejected }}">{{ stats.rejected }}</div>
+            <div class="stat-label">Rejected</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="stat-card stat-total">
+            <div class="stat-icon"><i class="bi bi-folder-fill"></i></div>
+            <div class="stat-value" data-count="{{ stats.total }}">{{ stats.total }}</div>
+            <div class="stat-label">Total Requests</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Filter Tabs ── -->
+<div class="filter-tabs mb-4">
+    <a href="{% url 'attendance:coordinator_dashboard' %}" class="filter-tab {% if not status_filter %}active{% endif %}">
+        All Active
+    </a>
+    <a href="?status=pending" class="filter-tab {% if status_filter == 'pending' %}active{% endif %}">
+        <i class="bi bi-hourglass-split"></i> Pending
+    </a>
+    <a href="?status=coordinator_approved" class="filter-tab {% if status_filter == 'coordinator_approved' %}active{% endif %}">
+        <i class="bi bi-check-circle"></i> Approved
+    </a>
+    <a href="?status=coordinator_rejected" class="filter-tab {% if status_filter == 'coordinator_rejected' %}active{% endif %}">
+        <i class="bi bi-x-circle"></i> Rejected
+    </a>
+</div>
+
+<!-- ── Requests Table ── -->
+<div class="card data-card">
+    <div class="card-header">
+        <h5 class="card-title mb-0"><i class="bi bi-clipboard-check me-2"></i>Student Requests</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if requests %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0" id="coordinatorTable">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Division</th>
+                        <th>Event</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for req in requests %}
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">{{ req.student.get_full_name|default:req.student.username }}</div>
+                            <small class="text-muted">{{ req.student.department }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-info text-dark">{{ req.student.get_division_display|default:"—" }}</span>
+                        </td>
+                        <td>
+                            <div>{{ req.event.name }}</div>
+                            <small class="text-muted">{{ req.event.date|date:"d/m/Y" }}</small>
+                        </td>
+                        <td><small>{{ req.reason|truncatewords:10 }}</small></td>
+                        <td>
+                            <span class="status-badge status-{{ req.status }}">
+                                {{ req.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ req.created_at|timesince }} ago</small>
+                        </td>
+                        <td>
+                            {% if req.status == 'pending' %}
+                            <a href="{% url 'attendance:coordinator_review' req.pk %}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-pencil-square"></i> Review
+                            </a>
+                            {% else %}
+                            <span class="text-muted small">Reviewed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-inbox"></i>
+            <h5>No requests found</h5>
+            <p>There are no student requests matching this filter.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

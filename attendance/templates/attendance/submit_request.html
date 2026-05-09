@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Request — AttendEAse{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1 class="dashboard-title">Submit Attendance Request</h1>
+        <p class="dashboard-subtitle">Select an event and explain why you'd like to attend</p>
+    </div>
+    <a href="{% url 'attendance:student_dashboard' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card data-card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bi bi-send-fill me-2"></i>New Request</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{% url 'attendance:submit_request' %}" id="submitRequestForm">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label for="id_event" class="form-label fw-semibold">Event</label>
+                        {{ form.event }}
+                        {% if form.event.errors %}
+                            <div class="invalid-feedback d-block">{{ form.event.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">Select the event you want to attend.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_reason" class="form-label fw-semibold">Reason</label>
+                        {{ form.reason }}
+                        {% if form.reason.errors %}
+                            <div class="invalid-feedback d-block">{{ form.reason.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">Explain why attending this event is important for you.</div>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger py-2">
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex gap-3 mt-4">
+                        <button type="submit" class="btn btn-primary btn-glow" id="submitBtn">
+                            <i class="bi bi-send-fill me-2"></i>Submit Request
+                        </button>
+                        <a href="{% url 'attendance:student_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

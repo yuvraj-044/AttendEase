@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Register — AttendEAse{% endblock %}
+
+{% block auth_content %}
+<div class="auth-container">
+    <div class="auth-card auth-card-register">
+        <!-- Left Decorative Panel -->
+        <div class="auth-hero">
+            <div class="auth-hero-content">
+                <i class="bi bi-calendar-check-fill auth-hero-icon"></i>
+                <h1>AttendEAse</h1>
+                <p>Join the platform and start<br>managing event attendance</p>
+                <div class="auth-hero-features">
+                    <div class="feature"><i class="bi bi-person-fill"></i> Students — Apply for events</div>
+                    <div class="feature"><i class="bi bi-clipboard-check-fill"></i> Coordinators — Review requests</div>
+                    <div class="feature"><i class="bi bi-mortarboard-fill"></i> Teachers — Final approval</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Form Panel -->
+        <div class="auth-form-panel">
+            <div class="auth-form-header">
+                <h2>Create an account</h2>
+                <p>Fill in your details to get started</p>
+            </div>
+
+            <form method="POST" action="{% url 'users:register' %}" class="auth-form" id="registerForm">
+                {% csrf_token %}
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="id_first_name" class="form-label">First Name</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.first_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_last_name" class="form-label">Last Name</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="invalid-feedback d-block">{{ form.last_name.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="id_username" class="form-label">Username</label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_email" class="form-label">Email</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_role" class="form-label">Role</label>
+                    {{ form.role }}
+                    {% if form.role.errors %}
+                        <div class="invalid-feedback d-block">{{ form.role.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group" id="divisionGroup">
+                    <label for="id_division" class="form-label">Division</label>
+                    {{ form.division }}
+                    <small class="form-text text-muted">Required for Students and Teachers</small>
+                    {% if form.division.errors %}
+                        <div class="invalid-feedback d-block">{{ form.division.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="id_student_id" class="form-label">Student / Staff ID</label>
+                        {{ form.student_id }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_department" class="form-label">Department</label>
+                        {{ form.department }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_phone" class="form-label">Phone</label>
+                    {{ form.phone }}
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="id_password1" class="form-label">Password</label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                            <div class="invalid-feedback d-block">{{ form.password1.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="id_password2" class="form-label">Confirm Password</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <div class="invalid-feedback d-block">{{ form.password2.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2 small">
+                        {% for error in form.non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-primary btn-auth" id="registerSubmit">
+                    <i class="bi bi-person-plus-fill me-2"></i>Create Account
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Already have an account? <a href="{% url 'users:login' %}">Sign in</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

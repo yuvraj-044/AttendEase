@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Events — AttendEAse{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1 class="dashboard-title">Events</h1>
+        <p class="dashboard-subtitle">Browse active college events</p>
+    </div>
+    {% if user.is_coordinator %}
+    <a href="{% url 'events:event_create' %}" class="btn btn-primary btn-glow">
+        <i class="bi bi-plus-lg me-2"></i>Create Event
+    </a>
+    {% endif %}
+</div>
+
+{% if events %}
+<div class="row g-4">
+    {% for event in events %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card data-card event-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="event-date-badge">
+                        <div class="month">{{ event.date|date:"M" }}</div>
+                        <div class="day">{{ event.date|date:"d" }}</div>
+                    </div>
+                    {% if event.is_active %}
+                        <span class="badge bg-success-subtle text-success">Active</span>
+                    {% else %}
+                        <span class="badge bg-secondary-subtle text-secondary">Inactive</span>
+                    {% endif %}
+                </div>
+                <h5 class="card-title fw-bold">{{ event.name }}</h5>
+                <p class="card-text text-muted small">{{ event.description|truncatewords:20 }}</p>
+                <div class="event-meta">
+                    <div><i class="bi bi-clock me-1"></i> {{ event.time|time:"h:i A" }}</div>
+                    <div><i class="bi bi-geo-alt me-1"></i> {{ event.venue }}</div>
+                    <div><i class="bi bi-person me-1"></i> {{ event.organizer.get_full_name|default:event.organizer.username }}</div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0 pt-0">
+                <div class="d-flex gap-2">
+                    <a href="{% url 'events:event_detail' event.pk %}" class="btn btn-sm btn-outline-primary flex-fill">
+                        <i class="bi bi-eye me-1"></i>Details
+                    </a>
+                    {% if user.is_coordinator and event.organizer == user %}
+                    <a href="{% url 'events:event_edit' event.pk %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card data-card">
+    <div class="card-body">
+        <div class="empty-state">
+            <i class="bi bi-calendar-x"></i>
+            <h5>No events available</h5>
+            <p>There are no active events at the moment.</p>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login — AttendEAse{% endblock %}
+
+{% block auth_content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <!-- Left Decorative Panel -->
+        <div class="auth-hero">
+            <div class="auth-hero-content">
+                <i class="bi bi-calendar-check-fill auth-hero-icon"></i>
+                <h1>AttendEAse</h1>
+                <p>College Event Attendance<br>Management System</p>
+                <div class="auth-hero-features">
+                    <div class="feature"><i class="bi bi-check2-circle"></i> Multi-step approval workflow</div>
+                    <div class="feature"><i class="bi bi-check2-circle"></i> Real-time status tracking</div>
+                    <div class="feature"><i class="bi bi-check2-circle"></i> Role-based dashboards</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Form Panel -->
+        <div class="auth-form-panel">
+            <div class="auth-form-header">
+                <h2>Welcome back</h2>
+                <p>Sign in to your account to continue</p>
+            </div>
+
+            <form method="POST" action="{% url 'users:login' %}" class="auth-form" id="loginForm">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="id_username" class="form-label">Username</label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_password" class="form-label">Password</label>
+                    {{ form.password }}
+                    {% if form.password.errors %}
+                        <div class="invalid-feedback d-block">{{ form.password.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger py-2 small">
+                        {% for error in form.non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <button type="submit" class="btn btn-primary btn-auth" id="loginSubmit">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account? <a href="{% url 'users:register' %}">Create one</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

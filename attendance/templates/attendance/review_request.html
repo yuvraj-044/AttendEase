@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} — AttendEAse{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div>
+        <h1 class="dashboard-title">{{ title }}</h1>
+        <p class="dashboard-subtitle">Review this attendance request</p>
+    </div>
+    {% if role == 'coordinator' %}
+    <a href="{% url 'attendance:coordinator_dashboard' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back
+    </a>
+    {% elif role == 'teacher' %}
+    <a href="{% url 'attendance:teacher_dashboard' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back
+    </a>
+    {% endif %}
+</div>
+
+<div class="row g-4">
+    <!-- Request Info -->
+    <div class="col-lg-7">
+        <div class="card data-card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bi bi-file-text-fill me-2"></i>Request Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">Student</div>
+                        <div class="detail-value">
+                            {{ att_request.student.get_full_name|default:att_request.student.username }}
+                            {% if att_request.student.student_id %}
+                                <span class="text-muted">({{ att_request.student.student_id }})</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Department</div>
+                        <div class="detail-value">{{ att_request.student.department|default:"—" }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Event</div>
+                        <div class="detail-value">{{ att_request.event.name }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Event Date</div>
+                        <div class="detail-value">{{ att_request.event.date|date:"d/m/Y" }} at {{ att_request.event.time|time:"h:i A" }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Venue</div>
+                        <div class="detail-value">{{ att_request.event.venue }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Submitted</div>
+                        <div class="detail-value">{{ att_request.created_at|date:"d/m/Y h:i A" }}</div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div>
+                    <div class="detail-label mb-2">Reason for attending</div>
+                    <div class="p-3 bg-light rounded">{{ att_request.reason }}</div>
+                </div>
+
+                {% if att_request.coordinator_remarks and role == 'teacher' %}
+                <hr>
+                <div>
+                    <div class="detail-label mb-2">Coordinator Remarks</div>
+                    <div class="p-3 bg-light rounded">
+                        <em>"{{ att_request.coordinator_remarks }}"</em>
+                        <br><small class="text-muted">— {{ att_request.coordinator.get_full_name|default:att_request.coordinator.username }}</small>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Action Panel -->
+    <div class="col-lg-5">
+        <div class="card data-card border-primary">
+            <div class="card-header bg-primary bg-opacity-10">
+                <h5 class="card-title mb-0 text-primary">
+                    <i class="bi bi-clipboard-check me-2"></i>Your Decision
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" id="reviewForm">
+                    {% csrf_token %}
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Remarks</label>
+                        {{ form.remarks }}
+                        <div class="form-text">Optional — add any comments about your decision.</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" name="action" value="approve" class="btn btn-success btn-lg" id="approveBtn">
+                            <i class="bi bi-check-circle-fill me-2"></i>Approve Request
+                        </button>
+                        <button type="submit" name="action" value="reject" class="btn btn-danger btn-lg" id="rejectBtn">
+                            <i class="bi bi-x-circle-fill me-2"></i>Reject Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
