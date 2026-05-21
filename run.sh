@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# AttendEAse Convenience Run Script for Mac
+# AttendEase Convenience Run Script for Mac
 
-echo "🚀 Starting AttendEAse Development Server..."
+echo "🚀 Starting AttendEase Development Server..."
 
 # Ensure we are in the right directory
 cd "$(dirname "$0")"

@@ -1,5 +1,5 @@
 """
-Django settings for AttendEAse project.
+Django settings for AttendEase project.
 Event Attendance Management System
 """
 

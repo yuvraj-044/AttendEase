@@ -1,6 +1,6 @@
-# AttendEAse — College Event Attendance Management System
+# AttendEase — College Event Attendance Management System
 
-AttendEAse is a Django-based web application designed to streamline the process of requesting and approving attendance for college events.
+AttendEase is a Django-based web application designed to streamline the process of requesting and approving attendance for college events.
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ Follow these steps to run the application in your external browser:
 ### 1. Open Terminal
 Open your terminal application and navigate to the project root directory:
 ```bash
-cd "/Users/yuvii/Documents/My Projects/AttendEAse"
+cd "/Users/yuvii/Documents/My Projects/AttendEase"
 ```
 
 ### 2. Install Dependencies

@@ -3,7 +3,7 @@
     <div class="sidebar-header">
         <div class="sidebar-brand">
             <i class="bi bi-calendar-check-fill brand-icon"></i>
-            <span class="brand-text">AttendEAse</span>
+            <span class="brand-text">AttendEase</span>
         </div>
         <button class="sidebar-close d-lg-none" id="sidebarClose">
             <i class="bi bi-x-lg"></i>
@@ -54,6 +54,12 @@
             <span>Events</span>
         </a>
         {% endif %}
+
+        <div class="nav-section-title" style="margin-top: 0.75rem;">Info</div>
+        <a href="{% url 'about' %}" class="nav-link-item {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>About</span>
+        </a>
     </nav>
 
     <!-- Sidebar Footer — User Info -->

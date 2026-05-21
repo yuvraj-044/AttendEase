@@ -1,5 +1,5 @@
 /**
- * AttendEAse — Main JavaScript
+ * AttendEase — Main JavaScript
  * Handles sidebar toggle, auto-dismiss alerts, and stat counter animations.
  */
 
