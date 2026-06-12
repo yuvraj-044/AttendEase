@@ -75,6 +75,7 @@
                         <th>Student</th>
                         <th>Division</th>
                         <th>Event</th>
+                        <th>Type</th>
                         <th>Reason</th>
                         <th>Status</th>
                         <th>Submitted</th>
@@ -94,6 +95,9 @@
                         <td>
                             <div>{{ req.event.name }}</div>
                             <small class="text-muted">{{ req.event.date|date:"d/m/Y" }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">{{ req.get_event_type_display }}</span>
                         </td>
                         <td><small>{{ req.reason|truncatewords:10 }}</small></td>
                         <td>

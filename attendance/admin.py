@@ -7,13 +7,14 @@ from .models import AttendanceRequest
 @admin.register(AttendanceRequest)
 class AttendanceRequestAdmin(admin.ModelAdmin):
     list_display = [
-        'student', 'event', 'status', 'is_attended',
+        'student', 'event', 'event_type', 'status', 'is_attended',
         'coordinator', 'teacher', 'created_at',
     ]
-    list_filter = ['status', 'is_attended', 'created_at']
+    list_filter = ['event_type', 'status', 'is_attended', 'created_at']
     search_fields = [
         'student__username', 'student__first_name',
-        'event__name', 'reason',
+        'event__name', 'external_event_name',
+        'external_college_name', 'reason',
     ]
     date_hierarchy = 'created_at'
     readonly_fields = ['created_at', 'updated_at']

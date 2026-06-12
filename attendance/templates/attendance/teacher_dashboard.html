@@ -10,6 +10,26 @@
     </div>
 </div>
 
+<!-- ── Downloads ── -->
+<div class="card data-card mb-4">
+    <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+        <div>
+            <h5 class="card-title mb-1"><i class="bi bi-download me-2"></i>Download Attendance Records</h5>
+            <p class="text-muted mb-0">Choose a month to export only that month's attendance records.</p>
+        </div>
+        <form method="GET" action="{% url 'attendance:teacher_export_excel' %}" class="teacher-export-form">
+            <select name="month" class="form-select export-month-select" aria-label="Select export month">
+                {% for value, label in month_choices %}
+                    <option value="{{ value }}" {% if export_month == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-success export-excel-btn">
+                <i class="bi bi-file-earmark-excel me-2"></i>Excel
+            </button>
+        </form>
+    </div>
+</div>
+
 <!-- ── Stat Cards ── -->
 <div class="row g-4 mb-4">
     <div class="col-6 col-lg-3">
@@ -72,6 +92,7 @@
                         <th>Student</th>
                         <th>Division</th>
                         <th>Event</th>
+                        <th>Type</th>
                         <th>Coordinator</th>
                         <th>Status</th>
                         <th>Attendance</th>
@@ -89,12 +110,19 @@
                             <span class="badge bg-info text-dark">{{ req.student.get_division_display|default:"—" }}</span>
                         </td>
                         <td>
-                            <div>{{ req.event.name }}</div>
-                            <small class="text-muted">{{ req.event.date|date:"d/m/Y" }}</small>
+                            <div>{{ req.display_event_name }}</div>
+                            <small class="text-muted">{{ req.display_event_date|date:"d/m/Y" }} · {{ req.display_event_venue }}</small>
+                        </td>
+                        <td>
+                            <span class="badge {% if req.event_type == 'open' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                {{ req.get_event_type_display }}
+                            </span>
                         </td>
                         <td>
                             <small>
-                                {% if req.coordinator %}
+                                {% if req.event_type == 'open' %}
+                                    <span class="text-muted"><i class="bi bi-arrow-right-circle"></i> Direct to teacher</span>
+                                {% elif req.coordinator %}
                                     <span class="text-success"><i class="bi bi-check-circle"></i> {{ req.coordinator.get_full_name|default:req.coordinator.username }}</span>
                                     {% if req.coordinator_remarks %}
                                         <br><em class="text-muted">"{{ req.coordinator_remarks|truncatewords:8 }}"</em>
@@ -142,6 +170,52 @@
             <i class="bi bi-inbox"></i>
             <h5>No requests found</h5>
             <p>There are no coordinator-approved requests at the moment.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ── Student Activity Overview ── -->
+<div class="card data-card mt-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0"><i class="bi bi-bar-chart-fill me-2"></i>Student Request Activity</h5>
+    </div>
+    <div class="card-body p-0">
+        {% if student_activity %}
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Roll No</th>
+                        <th>Total Requests</th>
+                        <th>Pending</th>
+                        <th>Approved</th>
+                        <th>Rejected</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in student_activity %}
+                    <tr>
+                        <td>
+                            <div class="fw-semibold">{{ student.get_full_name|default:student.username }}</div>
+                            <small class="text-muted">{{ student.department|default:"—" }}</small>
+                        </td>
+                        <td>{{ student.student_id|default:"—" }}</td>
+                        <td><span class="badge bg-primary">{{ student.total_requests }}</span></td>
+                        <td><span class="badge bg-warning text-dark">{{ student.pending_requests }}</span></td>
+                        <td><span class="badge bg-success">{{ student.approved_requests }}</span></td>
+                        <td><span class="badge bg-danger">{{ student.rejected_requests }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-bar-chart"></i>
+            <h5>No student activity yet</h5>
+            <p>Students who submit requests will appear here with their request counts.</p>
         </div>
         {% endif %}
     </div>

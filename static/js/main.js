@@ -74,4 +74,23 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         counters.forEach(animateCounter);
     }
+
+    // ── Button Click Ripple ──
+    const animatedButtons = document.querySelectorAll('.btn, .filter-tab, .nav-link-item');
+    animatedButtons.forEach((button) => {
+        button.addEventListener('click', (event) => {
+            const ripple = document.createElement('span');
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+
+            ripple.className = 'btn-ripple';
+            ripple.style.width = `${size}px`;
+            ripple.style.height = `${size}px`;
+            ripple.style.left = `${event.clientX - rect.left - size / 2}px`;
+            ripple.style.top = `${event.clientY - rect.top - size / 2}px`;
+
+            button.appendChild(ripple);
+            ripple.addEventListener('animationend', () => ripple.remove());
+        });
+    });
 });

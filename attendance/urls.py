@@ -17,6 +17,7 @@ urlpatterns = [
 
     # Teacher URLs
     path('teacher/', views.teacher_dashboard, name='teacher_dashboard'),
+    path('teacher/export/excel/', views.teacher_export_excel, name='teacher_export_excel'),
     path('teacher/review/<int:pk>/', views.teacher_review, name='teacher_review'),
     path('teacher/mark-attendance/<int:pk>/', views.mark_attendance, name='mark_attendance'),
 ]

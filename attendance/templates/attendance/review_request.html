@@ -43,15 +43,22 @@
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Event</div>
-                        <div class="detail-value">{{ att_request.event.name }}</div>
+                        <div class="detail-value">{{ att_request.display_event_name }}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Event Type</div>
+                        <div class="detail-value">{{ att_request.get_event_type_display }}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Event Date</div>
-                        <div class="detail-value">{{ att_request.event.date|date:"d/m/Y" }} at {{ att_request.event.time|time:"h:i A" }}</div>
+                        <div class="detail-value">
+                            {{ att_request.display_event_date|date:"d/m/Y" }}
+                            {% if att_request.display_event_time %} at {{ att_request.display_event_time|time:"h:i A" }}{% endif %}
+                        </div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Venue</div>
-                        <div class="detail-value">{{ att_request.event.venue }}</div>
+                        <div class="detail-value">{{ att_request.display_event_venue }}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Submitted</div>
@@ -66,7 +73,13 @@
                     <div class="p-3 bg-light rounded">{{ att_request.reason }}</div>
                 </div>
 
-                {% if att_request.coordinator_remarks and role == 'teacher' %}
+                {% if att_request.event_type == 'open' and role == 'teacher' %}
+                <hr>
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-arrow-right-circle me-2"></i>
+                    This open event request was sent directly to you.
+                </div>
+                {% elif att_request.coordinator_remarks and role == 'teacher' %}
                 <hr>
                 <div>
                     <div class="detail-label mb-2">Coordinator Remarks</div>

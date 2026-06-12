@@ -76,6 +76,7 @@
                 <thead>
                     <tr>
                         <th>Event</th>
+                        <th>Type</th>
                         <th>Date</th>
                         <th>Status</th>
                         <th>Submitted</th>
@@ -86,10 +87,15 @@
                     {% for req in requests %}
                     <tr>
                         <td>
-                            <div class="fw-semibold">{{ req.event.name }}</div>
-                            <small class="text-muted">{{ req.event.venue }}</small>
+                            <div class="fw-semibold">{{ req.display_event_name }}</div>
+                            <small class="text-muted">{{ req.display_event_venue }}</small>
                         </td>
-                        <td>{{ req.event.date|date:"d/m/Y" }}</td>
+                        <td>
+                            <span class="badge {% if req.event_type == 'open' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                                {{ req.get_event_type_display }}
+                            </span>
+                        </td>
+                        <td>{{ req.display_event_date|date:"d/m/Y" }}</td>
                         <td>
                             <span class="status-badge status-{{ req.status }}">
                                 {{ req.get_status_display }}

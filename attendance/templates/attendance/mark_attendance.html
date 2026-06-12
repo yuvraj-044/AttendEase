@@ -32,8 +32,8 @@
                 </div>
 
                 <div class="p-3 bg-light rounded mb-4">
-                    <div class="fw-semibold">{{ att_request.event.name }}</div>
-                    <small class="text-muted">{{ att_request.event.date|date:"d/m/Y" }} · {{ att_request.event.venue }}</small>
+                    <div class="fw-semibold">{{ att_request.display_event_name }}</div>
+                    <small class="text-muted">{{ att_request.display_event_date|date:"d/m/Y" }} · {{ att_request.display_event_venue }}</small>
                 </div>
 
                 <form method="POST" action="{% url 'attendance:mark_attendance' att_request.pk %}">

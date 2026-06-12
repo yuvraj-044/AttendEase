@@ -6,15 +6,33 @@ Attendance views for all three roles.
 """
 
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.http import HttpResponse
 from django.db.models import Count, Q
+from datetime import time
 
 from users.decorators import role_required
 from .models import AttendanceRequest
 from .forms import AttendanceRequestForm, ReviewForm
 from events.models import Event
+from users.models import CustomUser
+
+MONTH_CHOICES = [
+    ('', 'All Months'),
+    ('1', 'January'),
+    ('2', 'February'),
+    ('3', 'March'),
+    ('4', 'April'),
+    ('5', 'May'),
+    ('6', 'June'),
+    ('7', 'July'),
+    ('8', 'August'),
+    ('9', 'September'),
+    ('10', 'October'),
+    ('11', 'November'),
+    ('12', 'December'),
+]
 
 
 # ──────────────────────────────────────────────
@@ -60,16 +78,29 @@ def submit_request(request):
     if request.method == 'POST':
         form = AttendanceRequestForm(request.POST)
         if form.is_valid():
-            # Check for duplicate request
             event = form.cleaned_data['event']
-            if AttendanceRequest.objects.filter(student=request.user, event=event).exists():
+            event_type = form.cleaned_data['event_type']
+
+            # Check duplicate requests only for internal coordinator events.
+            if (
+                event_type == AttendanceRequest.EventType.COORDINATOR
+                and AttendanceRequest.objects.filter(student=request.user, event=event).exists()
+            ):
                 messages.warning(request, 'You have already submitted a request for this event.')
                 return redirect('attendance:student_dashboard')
 
             att_request = form.save(commit=False)
             att_request.student = request.user
+            if att_request.event_type == AttendanceRequest.EventType.OPEN:
+                att_request.status = AttendanceRequest.Status.COORDINATOR_APPROVED
             att_request.save()
-            messages.success(request, f'Your attendance request for "{event.name}" has been submitted!')
+            if att_request.event_type == AttendanceRequest.EventType.OPEN:
+                messages.success(
+                    request,
+                    f'Your open event request for "{att_request.display_event_name}" has been sent directly to your class teacher.'
+                )
+            else:
+                messages.success(request, f'Your attendance request for "{att_request.display_event_name}" has been submitted!')
             return redirect('attendance:student_dashboard')
     else:
         form = AttendanceRequestForm()
@@ -94,8 +125,11 @@ def request_detail_student(request, pk):
 @role_required('coordinator')
 def coordinator_dashboard(request):
     """Coordinator dashboard showing pending student requests for their own events only."""
-    # Only show requests for events created by this coordinator
-    all_requests = AttendanceRequest.objects.filter(event__organizer=request.user)
+    # Only show coordinator-event requests for events created by this coordinator.
+    all_requests = AttendanceRequest.objects.filter(
+        event__organizer=request.user,
+        event_type=AttendanceRequest.EventType.COORDINATOR,
+    )
 
     stats = {
         'pending': all_requests.filter(status=AttendanceRequest.Status.PENDING).count(),
@@ -134,6 +168,7 @@ def coordinator_review(request, pk):
     """Coordinator reviews and approves/rejects a pending request."""
     att_request = get_object_or_404(
         AttendanceRequest, pk=pk, status=AttendanceRequest.Status.PENDING,
+        event_type=AttendanceRequest.EventType.COORDINATOR,
         event__organizer=request.user  # Only the event's coordinator can review
     )
     form = ReviewForm()
@@ -196,12 +231,136 @@ def teacher_dashboard(request):
             ]
         )
 
+    student_activity = CustomUser.objects.filter(
+        role=CustomUser.Role.STUDENT,
+        division=request.user.division,
+        attendance_requests__isnull=False,
+    ).annotate(
+        total_requests=Count('attendance_requests', distinct=True),
+        pending_requests=Count(
+            'attendance_requests',
+            filter=Q(attendance_requests__status__in=[
+                AttendanceRequest.Status.PENDING,
+                AttendanceRequest.Status.COORDINATOR_APPROVED,
+            ]),
+            distinct=True,
+        ),
+        approved_requests=Count(
+            'attendance_requests',
+            filter=Q(attendance_requests__status=AttendanceRequest.Status.TEACHER_APPROVED),
+            distinct=True,
+        ),
+        rejected_requests=Count(
+            'attendance_requests',
+            filter=Q(attendance_requests__status__in=[
+                AttendanceRequest.Status.COORDINATOR_REJECTED,
+                AttendanceRequest.Status.TEACHER_REJECTED,
+            ]),
+            distinct=True,
+        ),
+    ).order_by('-total_requests', 'student_id', 'first_name', 'username')
+
+    export_month = request.GET.get('month', '')
+
     return render(request, 'attendance/teacher_dashboard.html', {
         'requests': requests[:30],
         'stats': stats,
         'status_filter': status_filter,
+        'student_activity': student_activity[:30],
+        'export_month': export_month,
+        'month_choices': MONTH_CHOICES,
         'teacher_division': request.user.get_division_display() if request.user.division else 'Not Assigned',
     })
+
+
+def _parse_month(value):
+    if not value:
+        return None, None
+    try:
+        month = int(value)
+        if 1 <= month <= 12:
+            return None, month
+        return None, None
+    except (TypeError, ValueError):
+        return None, None
+
+
+def _teacher_division_requests(user, month_value=''):
+    """Return all attendance requests for the teacher's division, oldest event first."""
+    requests = AttendanceRequest.objects.filter(
+        student__division=user.division
+    ).select_related(
+        'student', 'event'
+    )
+
+    _, month = _parse_month(month_value)
+    if month:
+        requests = requests.filter(created_at__month=month)
+
+    return sorted(
+        requests,
+        key=lambda req: (
+            req.export_event_date,
+            req.display_event_time or time.min,
+            req.student.student_id or '',
+            req.student.get_full_name() or req.student.username,
+        )
+    )
+
+
+def _export_status(att_request):
+    if att_request.status == AttendanceRequest.Status.TEACHER_APPROVED:
+        return 'Approved'
+    if att_request.status in [
+        AttendanceRequest.Status.COORDINATOR_REJECTED,
+        AttendanceRequest.Status.TEACHER_REJECTED,
+    ]:
+        return 'Rejected'
+    return 'Pending'
+
+
+@role_required('teacher')
+def teacher_export_excel(request):
+    """Download division attendance requests as an Excel workbook."""
+    from openpyxl import Workbook
+    from openpyxl.styles import Font, PatternFill
+    from openpyxl.utils import get_column_letter
+
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = 'Attendance'
+
+    headers = ['Student Name', 'Roll No', 'Division', 'Event Name', 'Event Type', 'Date', 'Status']
+    sheet.append(headers)
+
+    header_fill = PatternFill(start_color='D9EAF7', end_color='D9EAF7', fill_type='solid')
+    for cell in sheet[1]:
+        cell.font = Font(bold=True)
+        cell.fill = header_fill
+
+    month_value = request.GET.get('month', '')
+    for att_request in _teacher_division_requests(request.user, month_value):
+        sheet.append([
+            att_request.student.get_full_name() or att_request.student.username,
+            att_request.student.student_id or '',
+            att_request.student.get_division_display() or att_request.student.division or '',
+            att_request.display_event_name,
+            att_request.get_event_type_display(),
+            att_request.export_event_date.strftime('%Y-%m-%d'),
+            _export_status(att_request),
+        ])
+
+    for column_cells in sheet.columns:
+        max_length = max(len(str(cell.value or '')) for cell in column_cells)
+        sheet.column_dimensions[get_column_letter(column_cells[0].column)].width = min(max_length + 2, 35)
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    suffix = f'_{month_value}' if month_value else ''
+    response['Content-Disposition'] = f'attachment; filename="attendance_records{suffix}.xlsx"'
+    workbook.save(response)
+    return response
 
 
 @role_required('teacher')
@@ -253,7 +412,7 @@ def mark_attendance(request, pk):
         att_request.save()
         messages.success(
             request,
-            f'Attendance marked for {att_request.student} at "{att_request.event.name}".'
+            f'Attendance marked for {att_request.student} at "{att_request.display_event_name}".'
         )
         return redirect('attendance:teacher_dashboard')
 
