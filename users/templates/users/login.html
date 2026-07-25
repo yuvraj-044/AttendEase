@@ -31,7 +31,7 @@
                 {% csrf_token %}
 
                 <div class="form-group">
-                    <label for="id_username" class="form-label">Username</label>
+                    <label for="id_username" class="form-label">Username or Email</label>
                     {{ form.username }}
                     {% if form.username.errors %}
                         <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>

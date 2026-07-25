@@ -58,6 +58,7 @@
                     <div class="col-md-6">
                         <label for="id_email" class="form-label">Email</label>
                         {{ form.email }}
+                        <small class="form-text text-muted">Use your @pccoepune.org email address</small>
                         {% if form.email.errors %}
                             <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
                         {% endif %}
@@ -78,6 +79,15 @@
                     <small class="form-text text-muted">Required for Students and Teachers</small>
                     {% if form.division.errors %}
                         <div class="invalid-feedback d-block">{{ form.division.errors.0 }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group" id="gradeGroup">
+                    <label for="id_grade" class="form-label">Grade</label>
+                    {{ form.grade }}
+                    <small class="form-text text-muted">Select your current year: F.Y, S.Y, T.Y, or B.Tech</small>
+                    {% if form.grade.errors %}
+                        <div class="invalid-feedback d-block">{{ form.grade.errors.0 }}</div>
                     {% endif %}
                 </div>
 

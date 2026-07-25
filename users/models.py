@@ -36,6 +36,12 @@ class CustomUser(AbstractUser):
         O = 'O', 'Division O'
         P = 'P', 'Division P'
 
+    class Grade(models.TextChoices):
+        FY = 'FY', 'F.Y'
+        SY = 'SY', 'S.Y'
+        TY = 'TY', 'T.Y'
+        BTECH = 'BTECH', 'B.Tech'
+
     role = models.CharField(
         max_length=20,
         choices=Role.choices,
@@ -47,6 +53,12 @@ class CustomUser(AbstractUser):
         choices=Division.choices,
         blank=True,
         help_text='Class division (required for students and teachers).'
+    )
+    grade = models.CharField(
+        max_length=10,
+        choices=Grade.choices,
+        blank=True,
+        help_text='Academic year/grade (students only).'
     )
     student_id = models.CharField(
         max_length=20,
