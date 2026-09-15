@@ -1,146 +1,154 @@
 {% extends 'base.html' %}
-{% load static %}
-
-{% block title %}Register — AttendEase{% endblock %}
+{% block title %}Create Account — AttendEase{% endblock %}
 
 {% block auth_content %}
-<div class="auth-container">
-    <div class="auth-card auth-card-register">
-        <!-- Left Decorative Panel -->
-        <div class="auth-hero">
-            <div class="auth-hero-content">
-                <i class="bi bi-calendar-check-fill auth-hero-icon"></i>
-                <h1>AttendEase</h1>
-                <p>Join the platform and start<br>managing event attendance</p>
-                <div class="auth-hero-features">
-                    <div class="feature"><i class="bi bi-person-fill"></i> Students — Apply for events</div>
-                    <div class="feature"><i class="bi bi-clipboard-check-fill"></i> Coordinators — Review requests</div>
-                    <div class="feature"><i class="bi bi-mortarboard-fill"></i> Teachers — Final approval</div>
-                </div>
-            </div>
-        </div>
+<div class="auth-root">
 
-        <!-- Right Form Panel -->
-        <div class="auth-form-panel">
-            <div class="auth-form-header">
-                <h2>Create an account</h2>
-                <p>Fill in your details to get started</p>
-            </div>
-
-            <form method="POST" action="{% url 'users:register' %}" class="auth-form" id="registerForm">
-                {% csrf_token %}
-
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="id_first_name" class="form-label">First Name</label>
-                        {{ form.first_name }}
-                        {% if form.first_name.errors %}
-                            <div class="invalid-feedback d-block">{{ form.first_name.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label for="id_last_name" class="form-label">Last Name</label>
-                        {{ form.last_name }}
-                        {% if form.last_name.errors %}
-                            <div class="invalid-feedback d-block">{{ form.last_name.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="id_username" class="form-label">Username</label>
-                        {{ form.username }}
-                        {% if form.username.errors %}
-                            <div class="invalid-feedback d-block">{{ form.username.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label for="id_email" class="form-label">Email</label>
-                        {{ form.email }}
-                        <small class="form-text text-muted">Use your @pccoepune.org email address</small>
-                        {% if form.email.errors %}
-                            <div class="invalid-feedback d-block">{{ form.email.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_role" class="form-label">Role</label>
-                    {{ form.role }}
-                    {% if form.role.errors %}
-                        <div class="invalid-feedback d-block">{{ form.role.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group" id="divisionGroup">
-                    <label for="id_division" class="form-label">Division</label>
-                    {{ form.division }}
-                    <small class="form-text text-muted">Required for Students and Teachers</small>
-                    {% if form.division.errors %}
-                        <div class="invalid-feedback d-block">{{ form.division.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group" id="gradeGroup">
-                    <label for="id_grade" class="form-label">Grade</label>
-                    {{ form.grade }}
-                    <small class="form-text text-muted">Select your current year: F.Y, S.Y, T.Y, or B.Tech</small>
-                    {% if form.grade.errors %}
-                        <div class="invalid-feedback d-block">{{ form.grade.errors.0 }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="id_student_id" class="form-label">Student / Staff ID</label>
-                        {{ form.student_id }}
-                    </div>
-                    <div class="col-md-6">
-                        <label for="id_department" class="form-label">Department</label>
-                        {{ form.department }}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="id_phone" class="form-label">Phone</label>
-                    {{ form.phone }}
-                </div>
-
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="id_password1" class="form-label">Password</label>
-                        {{ form.password1 }}
-                        {% if form.password1.errors %}
-                            <div class="invalid-feedback d-block">{{ form.password1.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-6">
-                        <label for="id_password2" class="form-label">Confirm Password</label>
-                        {{ form.password2 }}
-                        {% if form.password2.errors %}
-                            <div class="invalid-feedback d-block">{{ form.password2.errors.0 }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger py-2 small">
-                        {% for error in form.non_field_errors %}
-                            <div>{{ error }}</div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-
-                <button type="submit" class="btn btn-primary btn-auth" id="registerSubmit">
-                    <i class="bi bi-person-plus-fill me-2"></i>Create Account
-                </button>
-            </form>
-
-            <div class="auth-footer">
-                <p>Already have an account? <a href="{% url 'users:login' %}">Sign in</a></p>
-            </div>
-        </div>
+  <!-- Left brand panel -->
+  <div class="auth-panel">
+    <div class="auth-panel-logo">
+      <div class="auth-panel-logo-icon">
+        <i class="bi bi-calendar-check-fill"></i>
+      </div>
+      <span class="auth-panel-logo-text">AttendEase</span>
     </div>
+    <h2>Join AttendEase</h2>
+    <p>Create your account to start submitting and managing event attendance requests.</p>
+    <ul class="auth-feature-list">
+      <li><i class="bi bi-person-fill"></i> Students — apply for events</li>
+      <li><i class="bi bi-clipboard-check-fill"></i> Coordinators — manage requests</li>
+      <li><i class="bi bi-mortarboard-fill"></i> Teachers — final approval</li>
+    </ul>
+  </div>
+
+  <!-- Right form area -->
+  <div class="auth-form-area" style="align-items:flex-start; padding-top:2rem; padding-bottom:2rem;">
+    <div class="auth-box auth-box-wide">
+      <div class="auth-box-header">
+        <h1>Create your account</h1>
+        <p>Use your @pccoepune.org email address</p>
+      </div>
+
+      <form method="POST" action="{% url 'users:register' %}" autocomplete="on" id="registerForm">
+        {% csrf_token %}
+
+        <!-- Name row -->
+        <div class="row g-3 mb-0">
+          <div class="col-6">
+            <div class="form-group">
+              <label class="form-label">First Name</label>
+              {{ form.first_name }}
+              {% if form.first_name.errors %}<div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.first_name.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label class="form-label">Last Name</label>
+              {{ form.last_name }}
+              {% if form.last_name.errors %}<div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.last_name.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Username / Email row -->
+        <div class="row g-3 mb-0">
+          <div class="col-6">
+            <div class="form-group">
+              <label class="form-label">Username</label>
+              {{ form.username }}
+              {% if form.username.errors %}<div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.username.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              {{ form.email }}
+              {% if form.email.errors %}<div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.email.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Role -->
+        <div class="form-group">
+          <label class="form-label">Role</label>
+          {{ form.role }}
+          {% if form.role.errors %}<div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.role.errors.0 }}</div>{% endif %}
+        </div>
+
+        <!-- Division / Grade -->
+        <div class="row g-3 mb-0">
+          <div class="col-6" id="divisionGroup">
+            <div class="form-group">
+              <label class="form-label">Division</label>
+              {{ form.division }}
+              <div class="form-text">Required for students and teachers</div>
+            </div>
+          </div>
+          <div class="col-6" id="gradeGroup">
+            <div class="form-group">
+              <label class="form-label">Grade / Year</label>
+              {{ form.grade }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Student ID / Department -->
+        <div class="row g-3 mb-0">
+          <div class="col-6">
+            <div class="form-group">
+              <label class="form-label">Student / Staff ID</label>
+              {{ form.student_id }}
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label class="form-label">Department</label>
+              {{ form.department }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone -->
+        <div class="form-group">
+          <label class="form-label">Phone</label>
+          {{ form.phone }}
+        </div>
+
+        <!-- Passwords -->
+        <div class="row g-3 mb-0">
+          <div class="col-6">
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              {{ form.password1 }}
+              {% if form.password1.errors %}<div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.password1.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-group">
+              <label class="form-label">Confirm Password</label>
+              {{ form.password2 }}
+              {% if form.password2.errors %}<div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.password2.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <div>{{ form.non_field_errors.0 }}</div>
+          </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:.5rem;">
+          <i class="bi bi-person-plus-fill"></i> Create Account
+        </button>
+      </form>
+
+      <div class="auth-footer-link">
+        Already have an account? <a href="{% url 'users:login' %}">Sign in</a>
+      </div>
+    </div>
+  </div>
+
 </div>
 {% endblock %}

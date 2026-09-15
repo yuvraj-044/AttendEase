@@ -1,763 +1,131 @@
 {% extends 'base.html' %}
-{% load static %}
-
 {% block title %}About — AttendEase{% endblock %}
-{% block page_title %}About AttendEase{% endblock %}
+{% block page_title %}About{% endblock %}
 
 {% block content %}
-<div class="about-page">
 
-    <!-- ── Hero Section ── -->
-    <div class="about-hero">
-        <div class="about-hero-bg">
-            <div class="hero-orb hero-orb-1"></div>
-            <div class="hero-orb hero-orb-2"></div>
-            <div class="hero-orb hero-orb-3"></div>
-        </div>
-        <div class="about-hero-content">
-            <div class="hero-icon-wrap">
-                <i class="bi bi-calendar-check-fill"></i>
-            </div>
-            <h1 class="about-title">
-                Attend<span class="title-accent">Ease</span>
-            </h1>
-            <p class="about-tagline">College Event Attendance Management System</p>
-            <div class="hero-divider"></div>
-            <p class="about-description">
-                A modern Django-based web application designed to streamline the process 
-                of requesting and approving attendance for college events. Built with 
-                role-based access control for <strong>Students</strong>, <strong>Coordinators</strong>, 
-                and <strong>Teachers</strong>.
-            </p>
-        </div>
-    </div>
-
-    <!-- ── Features Section ── -->
-    <div class="about-section">
-        <h2 class="section-heading">
-            <i class="bi bi-stars"></i>
-            Key Features
-        </h2>
-        <div class="features-grid">
-            <div class="feature-card" data-tilt>
-                <div class="feature-icon feature-icon-purple">
-                    <i class="bi bi-shield-lock-fill"></i>
-                </div>
-                <h3>Role-Based Access</h3>
-                <p>Dedicated dashboards and permissions for Students, Coordinators, and Teachers.</p>
-            </div>
-            <div class="feature-card" data-tilt>
-                <div class="feature-icon feature-icon-blue">
-                    <i class="bi bi-calendar-event-fill"></i>
-                </div>
-                <h3>Event Management</h3>
-                <p>Create, edit, and manage college events with full CRUD operations.</p>
-            </div>
-            <div class="feature-card" data-tilt>
-                <div class="feature-icon feature-icon-green">
-                    <i class="bi bi-check-circle-fill"></i>
-                </div>
-                <h3>Approval Workflow</h3>
-                <p>Multi-level attendance approval from Coordinators to Class Teachers.</p>
-            </div>
-            <div class="feature-card" data-tilt>
-                <div class="feature-icon feature-icon-orange">
-                    <i class="bi bi-people-fill"></i>
-                </div>
-                <h3>Division System</h3>
-                <p>Division-based student grouping with dedicated teacher assignments.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- ── Tech Stack Section ── -->
-    <div class="about-section">
-        <h2 class="section-heading">
-            <i class="bi bi-cpu-fill"></i>
-            Tech Stack
-        </h2>
-        <div class="tech-stack-grid">
-            <div class="tech-chip">
-                <i class="bi bi-filetype-py"></i>
-                <span>Python</span>
-            </div>
-            <div class="tech-chip">
-                <i class="bi bi-box"></i>
-                <span>Django</span>
-            </div>
-            <div class="tech-chip">
-                <i class="bi bi-database-fill"></i>
-                <span>SQLite</span>
-            </div>
-            <div class="tech-chip">
-                <i class="bi bi-bootstrap-fill"></i>
-                <span>Bootstrap 5</span>
-            </div>
-            <div class="tech-chip">
-                <i class="bi bi-filetype-js"></i>
-                <span>JavaScript</span>
-            </div>
-            <div class="tech-chip">
-                <i class="bi bi-filetype-css"></i>
-                <span>CSS3</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════════════════
-         CONTRIBUTORS SECTION
-         ══════════════════════════════════════════════════════ -->
-    <div class="about-section contributors-section">
-        <h2 class="section-heading">
-            <i class="bi bi-heart-fill"></i>
-            Meet the Team
-        </h2>
-        <p class="section-subtext">The brilliant minds behind AttendEase</p>
-
-        <div class="contributors-grid">
-
-            <!-- Contributor 1 — Yuvraj Baglane -->
-            <div class="contributor-card" id="contributor-1">
-                <div class="contributor-card-inner">
-                    <div class="contributor-glow"></div>
-                    <div class="contributor-avatar">
-                        <div class="avatar-ring"></div>
-                        <div class="avatar-initials">YB</div>
-                    </div>
-                    <h3 class="contributor-name">Yuvraj Baglane</h3>
-                    <div class="contributor-role">Developer</div>
-                    <div class="contributor-bar">
-                        <div class="bar-fill" style="--fill-width: 95%;"></div>
-                    </div>
-                    <div class="contributor-stats">
-                        <div class="stat-item">
-                            <i class="bi bi-server"></i>
-                            <span>Backend</span>
-                        </div>
-                        <div class="stat-item">
-                            <i class="bi bi-code-slash"></i>
-                            <span>Full Stack</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-particles">
-                    <span></span><span></span><span></span><span></span><span></span>
-                </div>
-            </div>
-
-            <!-- Contributor 2 — Bhushan Chandak -->
-            <div class="contributor-card" id="contributor-2">
-                <div class="contributor-card-inner">
-                    <div class="contributor-glow"></div>
-                    <div class="contributor-avatar">
-                        <div class="avatar-ring"></div>
-                        <div class="avatar-initials">BC</div>
-                    </div>
-                    <h3 class="contributor-name">Bhushan Chandak</h3>
-                    <div class="contributor-role">Developer</div>
-                    <div class="contributor-bar">
-                        <div class="bar-fill" style="--fill-width: 90%;"></div>
-                    </div>
-                    <div class="contributor-stats">
-                        <div class="stat-item">
-                            <i class="bi bi-layout-text-window-reverse"></i>
-                            <span>Frontend</span>
-                        </div>
-                        <div class="stat-item">
-                            <i class="bi bi-palette-fill"></i>
-                            <span>UI/UX</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-particles">
-                    <span></span><span></span><span></span><span></span><span></span>
-                </div>
-            </div>
-
-            <!-- Contributor 3 — Rakshit Gogulwar -->
-            <div class="contributor-card" id="contributor-3">
-                <div class="contributor-card-inner">
-                    <div class="contributor-glow"></div>
-                    <div class="contributor-avatar">
-                        <div class="avatar-ring"></div>
-                        <div class="avatar-initials">RG</div>
-                    </div>
-                    <h3 class="contributor-name">Rakshit Gogulwar</h3>
-                    <div class="contributor-role">Developer</div>
-                    <div class="contributor-bar">
-                        <div class="bar-fill" style="--fill-width: 88%;"></div>
-                    </div>
-                    <div class="contributor-stats">
-                        <div class="stat-item">
-                            <i class="bi bi-gear-fill"></i>
-                            <span>Core Logic</span>
-                        </div>
-                        <div class="stat-item">
-                            <i class="bi bi-bug-fill"></i>
-                            <span>Testing</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-particles">
-                    <span></span><span></span><span></span><span></span><span></span>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ── Footer ── -->
-    <div class="about-footer">
-        <p>Made with <i class="bi bi-heart-fill text-danger"></i> by the AttendEase Team &bull; {{ current_year }}</p>
-    </div>
-
+<div class="page-header">
+  <div class="page-header-text">
+    <h1 class="page-title">About AttendEase</h1>
+    <p class="page-subtitle">College Event Attendance Management System</p>
+  </div>
 </div>
 
-<style>
-/* ═══════════════════════════════════════════════════
-   ABOUT PAGE — Premium Glassmorphic Design
-   ═══════════════════════════════════════════════════ */
+<div class="row g-4">
+
+  <!-- Project overview -->
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-header-title"><i class="bi bi-info-circle-fill"></i> Overview</h2>
+      </div>
+      <div class="card-body">
+        <p style="color:var(--text-secondary);line-height:1.75;margin:0 0 1rem;">
+          AttendEase is a Django-based web application that streamlines the process of
+          requesting and approving attendance for college events. It provides dedicated
+          dashboards for three roles — Students, Coordinators, and Teachers — connected
+          through a structured two-stage approval workflow.
+        </p>
+
+        <!-- Workflow -->
+        <div class="form-section">
+          <div class="form-section-title"><i class="bi bi-diagram-3-fill"></i> Approval Workflow</div>
+          <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:.825rem;font-weight:600;">
+            <span class="badge badge-pending" style="font-size:.75rem;">Student Submits</span>
+            <i class="bi bi-arrow-right" style="color:var(--gray-400);"></i>
+            <span class="badge badge-progress" style="font-size:.75rem;">Coordinator Reviews</span>
+            <i class="bi bi-arrow-right" style="color:var(--gray-400);"></i>
+            <span class="badge badge-brand" style="font-size:.75rem;">Teacher Approves</span>
+            <i class="bi bi-arrow-right" style="color:var(--gray-400);"></i>
+            <span class="badge badge-approved" style="font-size:.75rem;">Attendance Marked</span>
+          </div>
+          <p style="font-size:.8rem;color:var(--text-muted);margin:.75rem 0 0;">
+            Open (external) events skip the coordinator step and go directly to the teacher.
+          </p>
+        </div>
+
+        <!-- Features grid -->
+        <div class="row g-3" style="margin-top:.25rem;">
+          {% for icon, title, desc in features %}
+          <div class="col-sm-6">
+            <div style="
+              display:flex;gap:.75rem;align-items:flex-start;
+              padding:.875rem;border:1px solid var(--border);
+              border-radius:var(--r-md);background:var(--gray-50);">
+              <div style="
+                width:34px;height:34px;border-radius:var(--r-sm);
+                background:var(--brand-muted);color:var(--brand);
+                display:flex;align-items:center;justify-content:center;
+                font-size:.95rem;flex-shrink:0;">
+                <i class="bi {{ icon }}"></i>
+              </div>
+              <div>
+                <div style="font-size:.825rem;font-weight:600;color:var(--text-primary);">{{ title }}</div>
+                <div style="font-size:.775rem;color:var(--text-muted);margin-top:.15rem;">{{ desc }}</div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Tech stack + team -->
+  <div class="col-lg-4">
+
+    <!-- Tech stack -->
+    <div class="card mb-4">
+      <div class="card-header">
+        <h2 class="card-header-title"><i class="bi bi-cpu-fill"></i> Tech Stack</h2>
+      </div>
+      <div class="card-body" style="padding:.875rem 1.25rem;">
+        {% for icon, name in stack %}
+        <div style="
+          display:flex;align-items:center;gap:.625rem;
+          padding:.5rem 0;
+          border-bottom:1px solid var(--gray-100);">
+          <i class="bi {{ icon }}" style="color:var(--brand);width:16px;text-align:center;"></i>
+          <span style="font-size:.825rem;font-weight:500;color:var(--text-primary);">{{ name }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Team -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-header-title"><i class="bi bi-people-fill"></i> Team</h2>
+      </div>
+      <div class="card-body" style="padding:.875rem 1.25rem;">
+        {% for initials, name, role in team %}
+        <div style="
+          display:flex;align-items:center;gap:.75rem;
+          padding:.625rem 0;
+          border-bottom:1px solid var(--gray-100);">
+          <div style="
+            width:36px;height:36px;border-radius:50%;
+            background:var(--brand);color:#fff;
+            display:flex;align-items:center;justify-content:center;
+            font-size:.75rem;font-weight:700;flex-shrink:0;">
+            {{ initials }}
+          </div>
+          <div>
+            <div style="font-size:.825rem;font-weight:600;color:var(--text-primary);">{{ name }}</div>
+            <div style="font-size:.75rem;color:var(--text-muted);">{{ role }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Footer note -->
+<div style="text-align:center;margin-top:2rem;font-size:.8rem;color:var(--text-muted);">
+  AttendEase &mdash; Built with Django &middot; &copy; {{ current_year }}
+</div>
 
-.about-page {
-    max-width: 900px;
-    margin: 0 auto;
-    padding-bottom: 2rem;
-}
-
-/* ── Hero ── */
-.about-hero {
-    position: relative;
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-    background: linear-gradient(135deg, #0c0a1d 0%, #1a1145 40%, #2d1b69 70%, #0f0d2e 100%);
-    padding: 3rem 2.5rem;
-    margin-bottom: 2rem;
-    text-align: center;
-    color: white;
-    box-shadow: var(--shadow-xl);
-    border: 1px solid rgba(124,58,237,0.2);
-}
-
-.about-hero-bg {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-}
-
-.hero-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(60px);
-    opacity: 0.5;
-}
-
-.hero-orb-1 {
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(124,58,237,0.4) 0%, transparent 70%);
-    top: -100px; right: -50px;
-    animation: floatOrb 8s ease-in-out infinite;
-}
-
-.hero-orb-2 {
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(168,85,247,0.3) 0%, transparent 70%);
-    bottom: -80px; left: -40px;
-    animation: floatOrb 10s ease-in-out infinite reverse;
-}
-
-.hero-orb-3 {
-    width: 150px; height: 150px;
-    background: radial-gradient(circle, rgba(196,181,253,0.25) 0%, transparent 70%);
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    animation: floatOrb 12s ease-in-out infinite;
-}
-
-.about-hero-content {
-    position: relative;
-    z-index: 1;
-}
-
-.hero-icon-wrap {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 72px; height: 72px;
-    border-radius: 50%;
-    background: rgba(124,58,237,0.25);
-    border: 2px solid rgba(167,139,250,0.3);
-    margin-bottom: 1.25rem;
-    font-size: 2rem;
-    color: #c4b5fd;
-    animation: pulse-glow 3s ease-in-out infinite;
-}
-
-.about-title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    margin-bottom: 0.25rem;
-}
-
-.title-accent {
-    background: linear-gradient(135deg, #a78bfa, #c084fc, #e879f9);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.about-tagline {
-    font-size: 1rem;
-    opacity: 0.75;
-    font-weight: 500;
-    margin-bottom: 0.75rem;
-}
-
-.hero-divider {
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, #7c3aed, #a855f7, #c084fc);
-    border-radius: 2px;
-    margin: 1rem auto;
-}
-
-.about-description {
-    max-width: 560px;
-    margin: 0 auto;
-    font-size: 0.9rem;
-    line-height: 1.7;
-    opacity: 0.8;
-}
-
-/* ── Sections ── */
-.about-section {
-    margin-bottom: 2rem;
-    animation: fadeInUp 0.6s ease both;
-}
-
-.about-section:nth-child(3) { animation-delay: 0.1s; }
-.about-section:nth-child(4) { animation-delay: 0.2s; }
-.about-section:nth-child(5) { animation-delay: 0.3s; }
-
-.section-heading {
-    font-size: 1.35rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    letter-spacing: -0.02em;
-}
-
-.section-heading i {
-    color: var(--accent);
-    font-size: 1.1rem;
-}
-
-.section-subtext {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: 1.5rem;
-}
-
-/* ── Features Grid ── */
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-}
-
-.feature-card {
-    background: rgba(255,255,255,0.75);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.5);
-    border-radius: var(--radius-md);
-    padding: 1.5rem;
-    text-align: center;
-    transition: var(--transition-bounce);
-    cursor: default;
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    overflow: hidden;
-}
-
-.feature-card::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--gradient-primary);
-    transform: scaleX(0);
-    transition: transform 0.35s ease;
-    transform-origin: left;
-}
-
-.feature-card:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: var(--shadow-lg);
-    border-color: rgba(124,58,237,0.2);
-}
-
-.feature-card:hover::after {
-    transform: scaleX(1);
-}
-
-.feature-icon {
-    width: 52px; height: 52px;
-    border-radius: var(--radius-sm);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    margin-bottom: 0.85rem;
-}
-
-.feature-icon-purple { background: rgba(124,58,237,0.1); color: var(--accent); }
-.feature-icon-blue { background: rgba(37,99,235,0.1); color: var(--info); }
-.feature-icon-green { background: rgba(5,150,105,0.1); color: var(--success); }
-.feature-icon-orange { background: rgba(217,119,6,0.1); color: var(--warning); }
-
-.feature-card h3 {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.35rem;
-}
-
-.feature-card p {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    margin: 0;
-    line-height: 1.5;
-}
-
-/* ── Tech Stack ── */
-.tech-stack-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-
-.tech-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    border-radius: 100px;
-    background: rgba(255,255,255,0.8);
-    backdrop-filter: blur(8px);
-    border: 1px solid var(--border-color);
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    transition: var(--transition-bounce);
-    cursor: default;
-    box-shadow: var(--shadow-sm);
-}
-
-.tech-chip i {
-    color: var(--accent);
-    font-size: 1rem;
-}
-
-.tech-chip:hover {
-    transform: translateY(-3px) scale(1.05);
-    border-color: var(--accent-light);
-    box-shadow: var(--shadow-md);
-    background: rgba(124,58,237,0.05);
-}
-
-/* ══════════════════════════════════════════════════════
-   CONTRIBUTOR CARDS — Interactive & Animated
-   ══════════════════════════════════════════════════════ */
-
-.contributors-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.5rem;
-}
-
-.contributor-card {
-    position: relative;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    cursor: pointer;
-    transition: var(--transition-bounce);
-}
-
-.contributor-card:hover {
-    transform: translateY(-8px) scale(1.03);
-    z-index: 2;
-}
-
-.contributor-card-inner {
-    position: relative;
-    z-index: 1;
-    background: rgba(255,255,255,0.85);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255,255,255,0.5);
-    border-radius: var(--radius-lg);
-    padding: 2rem 1.5rem 1.5rem;
-    text-align: center;
-    box-shadow: var(--shadow-md);
-    transition: var(--transition);
-}
-
-.contributor-card:hover .contributor-card-inner {
-    border-color: rgba(124,58,237,0.3);
-    box-shadow: var(--shadow-xl), 0 0 40px rgba(124,58,237,0.12);
-}
-
-/* Glow */
-.contributor-glow {
-    position: absolute;
-    top: -40px; left: 50%;
-    transform: translateX(-50%);
-    width: 120px; height: 120px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.contributor-card:hover .contributor-glow {
-    opacity: 1;
-}
-
-/* Avatar */
-.contributor-avatar {
-    position: relative;
-    width: 80px; height: 80px;
-    margin: 0 auto 1rem;
-}
-
-.avatar-ring {
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    background: conic-gradient(from 0deg, #7c3aed, #a855f7, #c084fc, #e879f9, #a855f7, #7c3aed);
-    animation: spin-ring 4s linear infinite paused;
-    opacity: 0.6;
-}
-
-.contributor-card:hover .avatar-ring {
-    animation-play-state: running;
-    opacity: 1;
-}
-
-@keyframes spin-ring {
-    to { transform: rotate(360deg); }
-}
-
-.avatar-initials {
-    position: relative;
-    z-index: 1;
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #1a1145 0%, #2d1b69 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    border: 3px solid rgba(255,255,255,0.9);
-}
-
-.contributor-name {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: 0.2rem;
-    letter-spacing: -0.02em;
-}
-
-.contributor-role {
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--accent);
-    margin-bottom: 1rem;
-}
-
-/* Contribution Bar */
-.contributor-bar {
-    width: 100%;
-    height: 4px;
-    background: rgba(124,58,237,0.08);
-    border-radius: 2px;
-    margin-bottom: 1rem;
-    overflow: hidden;
-}
-
-.bar-fill {
-    height: 100%;
-    width: 0%;
-    background: var(--gradient-primary);
-    border-radius: 2px;
-    transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.contributor-card.animated .bar-fill {
-    width: var(--fill-width);
-}
-
-/* Stats */
-.contributor-stats {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    padding: 0.35rem 0.65rem;
-    border-radius: 100px;
-    background: rgba(124,58,237,0.05);
-    border: 1px solid rgba(124,58,237,0.08);
-    transition: var(--transition);
-}
-
-.stat-item i {
-    color: var(--accent-light);
-    font-size: 0.8rem;
-}
-
-.contributor-card:hover .stat-item {
-    background: rgba(124,58,237,0.1);
-    border-color: rgba(124,58,237,0.15);
-    color: var(--accent-dark);
-}
-
-/* Particles */
-.card-particles {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-    border-radius: var(--radius-lg);
-}
-
-.card-particles span {
-    position: absolute;
-    width: 4px; height: 4px;
-    border-radius: 50%;
-    background: var(--accent-light);
-    opacity: 0;
-}
-
-.contributor-card:hover .card-particles span {
-    animation: float-particle 1.5s ease-out forwards;
-}
-
-.card-particles span:nth-child(1) { left: 20%; bottom: 30%; animation-delay: 0s; }
-.card-particles span:nth-child(2) { left: 50%; bottom: 20%; animation-delay: 0.15s; }
-.card-particles span:nth-child(3) { left: 75%; bottom: 40%; animation-delay: 0.3s; }
-.card-particles span:nth-child(4) { left: 35%; bottom: 50%; animation-delay: 0.1s; }
-.card-particles span:nth-child(5) { left: 65%; bottom: 25%; animation-delay: 0.25s; }
-
-@keyframes float-particle {
-    0% {
-        opacity: 0;
-        transform: translateY(0) scale(0);
-    }
-    30% {
-        opacity: 0.8;
-        transform: translateY(-20px) scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-80px) scale(0.5);
-    }
-}
-
-/* ── Footer ── */
-.about-footer {
-    text-align: center;
-    padding: 1.5rem;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-}
-
-.about-footer i {
-    color: #dc2626;
-    animation: heartbeat 1.5s ease-in-out infinite;
-}
-
-@keyframes heartbeat {
-    0%, 100% { transform: scale(1); }
-    15% { transform: scale(1.25); }
-    30% { transform: scale(1); }
-    45% { transform: scale(1.15); }
-}
-
-/* ── Responsive ── */
-@media (max-width: 575.98px) {
-    .about-hero {
-        padding: 2rem 1.5rem;
-    }
-    .about-title {
-        font-size: 1.75rem;
-    }
-    .contributors-grid {
-        grid-template-columns: 1fr;
-    }
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // ── Animate contributor bars on scroll ──
-    const cards = document.querySelectorAll('.contributor-card');
-    
-    if ('IntersectionObserver' in window) {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.classList.add('animated');
-                    }, index * 200);
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.3 });
-
-        cards.forEach(card => observer.observe(card));
-    } else {
-        cards.forEach(card => card.classList.add('animated'));
-    }
-
-    // ── Tilt effect on feature cards ──
-    const tiltCards = document.querySelectorAll('[data-tilt]');
-    tiltCards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -5;
-            const rotateY = ((x - centerX) / centerX) * 5;
-            card.style.transform = `perspective(600px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px) scale(1.02)`;
-        });
-
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = '';
-        });
-    });
-});
-</script>
 {% endblock %}

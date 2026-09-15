@@ -1,34 +1,56 @@
-<!-- Top Navbar -->
-<header class="top-navbar">
-    <div class="navbar-left">
-        <button class="sidebar-toggle d-lg-none" id="sidebarToggle">
-            <i class="bi bi-list"></i>
-        </button>
-        <div class="page-title">
-            {% block page_title %}Dashboard{% endblock %}
+<header class="top-bar">
+
+  <div class="top-bar-left">
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Open menu">
+      <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Breadcrumb / page title -->
+    <nav class="page-breadcrumb" aria-label="breadcrumb">
+      <span>AttendEase</span>
+      <i class="bi bi-chevron-right" style="font-size:.65rem;"></i>
+      <span class="current">{% block page_title %}Dashboard{% endblock %}</span>
+    </nav>
+  </div>
+
+  <div class="top-bar-right">
+
+    <!-- Role chip -->
+    <span class="badge badge-brand" style="font-size:.7rem;">
+      {{ user.get_role_display }}
+      {% if user.division %} · {{ user.get_division_display }}{% endif %}
+    </span>
+
+    <!-- User dropdown -->
+    <div class="dropdown">
+      <button class="top-bar-user dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              style="border:none;background:none;">
+        <div class="top-bar-avatar">
+          {{ user.first_name|default:user.username|slice:":1"|upper }}
         </div>
+        <span class="d-none d-md-inline">
+          {{ user.first_name|default:user.username }}
+        </span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="font-size:.825rem;min-width:200px;">
+        <li>
+          <span class="dropdown-item-text text-muted" style="font-size:.775rem;">
+            Signed in as <strong>{{ user.username }}</strong>
+          </span>
+        </li>
+        <li><hr class="dropdown-divider my-1"></li>
+        <li>
+          <a class="dropdown-item d-flex align-items-center gap-2"
+             href="{% url 'users:logout' %}">
+            <i class="bi bi-box-arrow-right text-danger"></i> Sign out
+          </a>
+        </li>
+      </ul>
     </div>
-    <div class="navbar-right">
-        <div class="showcase-chip d-none d-xl-inline-flex">
-            <i class="bi bi-stars"></i>
-            <span>Academic Command Center</span>
-        </div>
-        <div class="dropdown">
-            <button class="btn btn-link nav-profile-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <div class="nav-avatar">
-                    {{ user.first_name|default:user.username|make_list|first|upper }}
-                </div>
-                <span class="d-none d-md-inline nav-username">{{ user.first_name|default:user.username }}</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                <li><span class="dropdown-item-text text-muted small">Signed in as <strong>{{ user.username }}</strong></span></li>
-                <li><hr class="dropdown-divider"></li>
-                <li>
-                    <a class="dropdown-item" href="{% url 'users:logout' %}">
-                        <i class="bi bi-box-arrow-right me-2"></i>Logout
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
+
+  </div>
 </header>

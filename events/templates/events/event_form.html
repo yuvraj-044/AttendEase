@@ -1,299 +1,127 @@
 {% extends 'base.html' %}
 {% block title %}{{ title }} — AttendEase{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
 
-{% block extra_js %}
-<!-- Flatpickr CSS & JS for Date and Time Pickers -->
+{% block extra_css %}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<style>
-.custom-clock-widget {
-    background: rgba(255,255,255,0.5);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-sm);
-}
-.clock-face {
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    background: var(--card-bg-solid);
-    border: 2px solid rgba(124,58,237,0.15);
-    position: relative;
-    cursor: pointer;
-    touch-action: none;
-    box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
-}
-.clock-center {
-    width: 14px;
-    height: 14px;
-    background: var(--accent);
-    border-radius: 50%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 10;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-.clock-hand {
-    width: 2px;
-    height: 38%;
-    background: var(--accent);
-    position: absolute;
-    bottom: 50%;
-    left: calc(50% - 1px);
-    transform-origin: bottom center;
-    transition: transform 0.1s ease-out;
-    z-index: 5;
-}
-.clock-hand::after {
-    content: '';
-    width: 32px;
-    height: 32px;
-    background: var(--accent);
-    border-radius: 50%;
-    position: absolute;
-    top: -16px;
-    left: -15px;
-    opacity: 0.85;
-}
-.clock-number {
-    position: absolute;
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    line-height: 30px;
-    font-weight: 700;
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    transform: translate(-50%, -50%);
-    user-select: none;
-    z-index: 1;
-}
-</style>
 {% endblock %}
 
 {% block content %}
-<div class="dashboard-header">
-    <div>
-        <h1 class="dashboard-title">{{ title }}</h1>
-        <p class="dashboard-subtitle">{% if event %}Edit event details{% else %}Fill in the event details{% endif %}</p>
-    </div>
-    <a href="{% url 'events:event_list' %}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-2"></i>Back
-    </a>
+
+<div class="page-header">
+  <div class="page-header-text">
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-subtitle">{% if event %}Update the event details below{% else %}Fill in the details to create a new event{% endif %}</p>
+  </div>
+  <a href="{% url 'events:event_list' %}" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
 </div>
+
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card data-card">
-            <div class="card-header">
-                <h5 class="card-title mb-0"><i class="bi bi-calendar-plus-fill me-2"></i>{{ title }}</h5>
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-header-title">
+          <i class="bi bi-calendar-plus-fill"></i> Event Details
+        </h2>
+      </div>
+      <div class="card-body">
+        <form method="POST" id="eventForm">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label class="form-label">Event Name</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+              <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.name.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+              <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.description.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">Date</label>
+                {{ form.date }}
+                {% if form.date.errors %}
+                  <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.date.errors.0 }}</div>
+                {% endif %}
+              </div>
             </div>
-            <div class="card-body">
-                <form method="POST" id="eventForm">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="id_name" class="form-label fw-semibold">Event Name</label>
-                        {{ form.name }}
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_description" class="form-label fw-semibold">Description</label>
-                        {{ form.description }}
-                    </div>
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label for="id_date" class="form-label fw-semibold">Date</label>
-                            {{ form.date }}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label fw-semibold">Time</label>
-                            
-                            <!-- Custom Circular Clock Widget -->
-                            <div class="custom-clock-widget mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-primary active" id="modeHour">Hour</button>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" id="modeMinute">Min</button>
-                                    </div>
-                                    <div class="fw-bold fs-4 text-primary" id="clockDisplay">12:00</div>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-outline-secondary active" id="modeAM">AM</button>
-                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="modePM">PM</button>
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-center mb-3">
-                                    <div class="clock-face" id="clockFace">
-                                        <div class="clock-center"></div>
-                                        <div class="clock-hand" id="clockHand"></div>
-                                    </div>
-                                </div>
-                                
-                                <label for="id_time" class="form-label fw-semibold text-muted fs-6 mb-1">Time Input (Synced)</label>
-                                {{ form.time }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_venue" class="form-label fw-semibold">Venue</label>
-                        {{ form.venue }}
-                    </div>
-                    <div class="mb-4 form-check">
-                        {{ form.is_active }}
-                        <label for="id_is_active" class="form-check-label">Active</label>
-                    </div>
-                    <div class="d-flex gap-3">
-                        <button type="submit" class="btn btn-primary btn-glow" id="saveEventBtn">
-                            <i class="bi bi-check-lg me-2"></i>{% if event %}Update{% else %}Create{% endif %}
-                        </button>
-                        <a href="{% url 'events:event_list' %}" class="btn btn-outline-secondary">Cancel</a>
-                    </div>
-                </form>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label">Time</label>
+                {{ form.time }}
+                {% if form.time.errors %}
+                  <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.time.errors.0 }}</div>
+                {% endif %}
+              </div>
             </div>
-        </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Venue</label>
+            {{ form.venue }}
+            {% if form.venue.errors %}
+              <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.venue.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div style="display:flex;align-items:center;gap:.625rem;margin-bottom:1.25rem;">
+            {{ form.is_active }}
+            <label class="form-check-label" for="id_is_active">
+              Mark as active (visible to students)
+            </label>
+          </div>
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <div>{{ form.non_field_errors.0 }}</div>
+            </div>
+          {% endif %}
+
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg"></i>
+              {% if event %}Update Event{% else %}Create Event{% endif %}
+            </button>
+            <a href="{% url 'events:event_list' %}" class="btn btn-secondary">Cancel</a>
+          </div>
+
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- Clock JavaScript Logic -->
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // 1. Initialize Flatpickr Pickers
-    flatpickr(".time-picker", {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i", 
-        altInput: true,
-        altFormat: "h:i K",
-        time_24hr: false
-    });
-    
-    flatpickr(".date-picker", {
-        dateFormat: "Y-m-d",
-        altInput: true,
-        altFormat: "d/m/Y",
-    });
-
-    // 2. Custom Clock Interaction Logic
-    let currentMode = 'hour'; 
-    let currentHour = 12;
-    let currentMinute = 0;
-    let isAM = true;
-    let isDragging = false;
-
-    const face = document.getElementById('clockFace');
-    const hand = document.getElementById('clockHand');
-    const display = document.getElementById('clockDisplay');
-
-    function updateClock() {
-        let deg;
-        if (currentMode === 'hour') {
-            deg = (currentHour % 12) * 30;
-        } else {
-            deg = currentMinute * 6;
-        }
-        hand.style.transform = `rotate(${deg}deg)`;
-        
-        let hDisplay = currentHour === 0 ? 12 : currentHour;
-        if (hDisplay > 12) hDisplay -= 12;
-        let mDisplay = currentMinute.toString().padStart(2, '0');
-        display.textContent = `${hDisplay}:${mDisplay}`;
-        
-        const fpInput = document.querySelector(".time-picker");
-        if (fpInput && fpInput._flatpickr) {
-            let fp = fpInput._flatpickr;
-            let h24 = isAM ? (hDisplay === 12 ? 0 : hDisplay) : (hDisplay === 12 ? 12 : hDisplay + 12);
-            let dateObj = new Date();
-            dateObj.setHours(h24, currentMinute);
-            fp.setDate(dateObj, true); 
-        }
-    }
-
-    function handleClockInteract(e) {
-        if (!face) return;
-        const rect = face.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        
-        let clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        let clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        
-        let angle = Math.atan2(clientY - cy, clientX - cx);
-        let deg = angle * (180 / Math.PI) + 90;
-        if (deg < 0) deg += 360;
-        
-        if (currentMode === 'hour') {
-            let hr = Math.round(deg / 30);
-            if (hr === 0) hr = 12;
-            currentHour = hr;
-        } else {
-            let min = Math.round(deg / 6);
-            if (min === 60) min = 0;
-            currentMinute = min;
-        }
-        updateClock();
-    }
-
-    face.addEventListener('mousedown', (e) => { isDragging = true; handleClockInteract(e); });
-    document.addEventListener('mousemove', (e) => { if (isDragging) handleClockInteract(e); });
-    document.addEventListener('mouseup', () => { isDragging = false; });
-
-    face.addEventListener('touchstart', (e) => { isDragging = true; e.preventDefault(); handleClockInteract(e); }, {passive: false});
-    document.addEventListener('touchmove', (e) => { if (isDragging) { e.preventDefault(); handleClockInteract(e); } }, {passive: false});
-    document.addEventListener('touchend', () => { isDragging = false; });
-
-    function drawNumbers() {
-        face.querySelectorAll('.clock-number').forEach(n => n.remove());
-        const radius = 85; 
-        let items = currentMode === 'hour' ? [12,1,2,3,4,5,6,7,8,9,10,11] : [0,5,10,15,20,25,30,35,40,45,50,55];
-        
-        items.forEach((num, i) => {
-            let angle = i * 30 * (Math.PI / 180) - Math.PI / 2;
-            let nx = 110 + radius * Math.cos(angle); // 110 is center of 220px clock
-            let ny = 110 + radius * Math.sin(angle);
-            
-            let el = document.createElement('div');
-            el.className = 'clock-number';
-            el.textContent = num === 0 ? '00' : num;
-            el.style.left = nx + 'px';
-            el.style.top = ny + 'px';
-            face.appendChild(el);
-        });
-    }
-
-    document.getElementById('modeHour').addEventListener('click', function() {
-        currentMode = 'hour';
-        this.classList.add('active');
-        document.getElementById('modeMinute').classList.remove('active');
-        drawNumbers();
-        updateClock();
-    });
-
-    document.getElementById('modeMinute').addEventListener('click', function() {
-        currentMode = 'minute';
-        this.classList.add('active');
-        document.getElementById('modeHour').classList.remove('active');
-        drawNumbers();
-        updateClock();
-    });
-
-    document.getElementById('modeAM').addEventListener('click', function() {
-        isAM = true;
-        this.classList.add('active');
-        document.getElementById('modePM').classList.remove('active');
-        updateClock();
-    });
-
-    document.getElementById('modePM').addEventListener('click', function() {
-        isAM = false;
-        this.classList.add('active');
-        document.getElementById('modeAM').classList.remove('active');
-        updateClock();
-    });
-
-    drawNumbers();
-    
-    // Slight delay to ensure Flatpickr is initialized before we sync the initial time
-    setTimeout(updateClock, 100);
+document.addEventListener('DOMContentLoaded', () => {
+  flatpickr('.date-picker', {
+    dateFormat: 'Y-m-d',
+    altInput: true,
+    altFormat: 'd M Y',
+  });
+  flatpickr('.time-picker', {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: 'H:i',
+    altInput: true,
+    altFormat: 'h:i K',
+    time_24hr: false,
+  });
 });
 </script>
 {% endblock %}

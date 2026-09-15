@@ -1,154 +1,163 @@
 {% extends 'base.html' %}
-
 {% block title %}Submit Request — AttendEase{% endblock %}
+{% block page_title %}Submit Request{% endblock %}
 
 {% block content %}
-<div class="dashboard-header">
-    <div>
-        <h1 class="dashboard-title">Submit Attendance Request</h1>
-        <p class="dashboard-subtitle">Select an event and explain why you'd like to attend</p>
-    </div>
-    <a href="{% url 'attendance:student_dashboard' %}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-    </a>
+
+<div class="page-header">
+  <div class="page-header-text">
+    <h1 class="page-title">New Attendance Request</h1>
+    <p class="page-subtitle">Select an event and provide your reason for attending</p>
+  </div>
+  <a href="{% url 'attendance:student_dashboard' %}" class="btn btn-secondary">
+    <i class="bi bi-arrow-left"></i> Back
+  </a>
 </div>
 
 <div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card data-card">
-            <div class="card-header">
-                <h5 class="card-title mb-0"><i class="bi bi-send-fill me-2"></i>New Request</h5>
+  <div class="col-lg-8 col-xl-7">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-header-title"><i class="bi bi-send-fill"></i> Request Details</h2>
+      </div>
+      <div class="card-body">
+
+        <form method="POST" action="{% url 'attendance:submit_request' %}" id="submitForm">
+          {% csrf_token %}
+
+          <!-- Event Type -->
+          <div class="form-section">
+            <div class="form-section-title"><i class="bi bi-toggles"></i> Event Type</div>
+            <div class="radio-group">
+              {% for radio in form.event_type %}
+              <label class="radio-pill">
+                {{ radio.tag }}
+                <span class="radio-pill-label">{{ radio.choice_label }}</span>
+              </label>
+              {% endfor %}
             </div>
-            <div class="card-body">
-                <form method="POST" action="{% url 'attendance:submit_request' %}" id="submitRequestForm">
-                    {% csrf_token %}
+            <div class="form-text" style="margin-top:.5rem;">
+              <strong>Internal:</strong> coordinator → teacher flow. &nbsp;
+              <strong>Open:</strong> goes directly to your class teacher.
+            </div>
+          </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Event Type</label>
-                        <div class="d-flex flex-column flex-sm-row gap-3">
-                            {% for radio in form.event_type %}
-                                <div class="form-check">
-                                    {{ radio.tag }}
-                                    <label class="form-check-label" for="{{ radio.id_for_label }}">
-                                        {{ radio.choice_label }}
-                                    </label>
-                                </div>
-                            {% endfor %}
-                        </div>
-                        {% if form.event_type.errors %}
-                            <div class="invalid-feedback d-block">{{ form.event_type.errors.0 }}</div>
-                        {% endif %}
-                        <div class="form-text">Coordinator events follow the normal coordinator-to-teacher flow. Open events go directly to your class teacher.</div>
-                    </div>
+          <!-- Internal event selector -->
+          <div id="coordinatorEventFields">
+            <div class="form-group">
+              <label class="form-label">Select Event</label>
+              {{ form.event }}
+              {% if form.event.errors %}
+                <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.event.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
 
-                    <div class="mb-4" id="coordinatorEventFields">
-                        <label for="id_event" class="form-label fw-semibold">Event</label>
-                        {{ form.event }}
-                        {% if form.event.errors %}
-                            <div class="invalid-feedback d-block">{{ form.event.errors.0 }}</div>
-                        {% endif %}
-                        <div class="form-text">Select the college event created by an event coordinator.</div>
-                    </div>
-
-                    <div id="openEventFields" class="open-event-panel mb-4">
-                        <div class="alert alert-info mb-4">
-                            <i class="bi bi-building me-2"></i>
-                            Open events are hosted outside our college and go directly to your class teacher.
-                        </div>
-
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="id_external_event_name" class="form-label fw-semibold">External Event Name</label>
-                                {{ form.external_event_name }}
-                                {% if form.external_event_name.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.external_event_name.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="id_external_college_name" class="form-label fw-semibold">Host College</label>
-                                {{ form.external_college_name }}
-                                {% if form.external_college_name.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.external_college_name.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="id_external_event_location" class="form-label fw-semibold">Location / Venue</label>
-                                {{ form.external_event_location }}
-                                {% if form.external_event_location.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.external_event_location.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-3">
-                                <label for="id_external_event_date" class="form-label fw-semibold">Date</label>
-                                {{ form.external_event_date }}
-                                {% if form.external_event_date.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.external_event_date.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-3">
-                                <label for="id_external_event_time" class="form-label fw-semibold">Time</label>
-                                {{ form.external_event_time }}
-                                {% if form.external_event_time.errors %}
-                                    <div class="invalid-feedback d-block">{{ form.external_event_time.errors.0 }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="id_reason" class="form-label fw-semibold">Reason</label>
-                        {{ form.reason }}
-                        {% if form.reason.errors %}
-                            <div class="invalid-feedback d-block">{{ form.reason.errors.0 }}</div>
-                        {% endif %}
-                        <div class="form-text">Explain why attending this event is important for you.</div>
-                    </div>
-
-                    {% if form.non_field_errors %}
-                        <div class="alert alert-danger py-2">
-                            {% for error in form.non_field_errors %}
-                                <div>{{ error }}</div>
-                            {% endfor %}
-                        </div>
+          <!-- Open / external event fields -->
+          <div id="openEventFields">
+            <div class="form-section">
+              <div class="form-section-title"><i class="bi bi-building"></i> External Event Details</div>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="form-group mb-0">
+                    <label class="form-label">Event Name</label>
+                    {{ form.external_event_name }}
+                    {% if form.external_event_name.errors %}
+                      <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.external_event_name.errors.0 }}</div>
                     {% endif %}
-
-                    <div class="d-flex gap-3 mt-4">
-                        <button type="submit" class="btn btn-primary btn-glow" id="submitBtn">
-                            <i class="bi bi-send-fill me-2"></i>Submit Request
-                        </button>
-                        <a href="{% url 'attendance:student_dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
-                    </div>
-                </form>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group mb-0">
+                    <label class="form-label">Host College</label>
+                    {{ form.external_college_name }}
+                    {% if form.external_college_name.errors %}
+                      <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.external_college_name.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group mb-0">
+                    <label class="form-label">Location / Venue</label>
+                    {{ form.external_event_location }}
+                    {% if form.external_event_location.errors %}
+                      <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.external_event_location.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group mb-0">
+                    <label class="form-label">Date</label>
+                    {{ form.external_event_date }}
+                    {% if form.external_event_date.errors %}
+                      <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.external_event_date.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group mb-0">
+                    <label class="form-label">Time</label>
+                    {{ form.external_event_time }}
+                    {% if form.external_event_time.errors %}
+                      <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.external_event_time.errors.0 }}</div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
             </div>
-        </div>
+          </div>
+
+          <!-- Reason -->
+          <div class="form-group">
+            <label class="form-label">Reason for Attending</label>
+            {{ form.reason }}
+            {% if form.reason.errors %}
+              <div class="invalid-msg"><i class="bi bi-exclamation-circle-fill"></i> {{ form.reason.errors.0 }}</div>
+            {% endif %}
+            <div class="form-text">Explain clearly why attending this event is relevant to your studies.</div>
+          </div>
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <div>{{ form.non_field_errors.0 }}</div>
+            </div>
+          {% endif %}
+
+          <div class="d-flex gap-2" style="margin-top:1.25rem;">
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-send-fill"></i> Submit Request
+            </button>
+            <a href="{% url 'attendance:student_dashboard' %}" class="btn btn-secondary">Cancel</a>
+          </div>
+
+        </form>
+      </div>
     </div>
+  </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const coordinatorFields = document.getElementById('coordinatorEventFields');
-    const openFields = document.getElementById('openEventFields');
-    const eventSelect = document.getElementById('id_event');
-    const openInputs = openFields ? openFields.querySelectorAll('input') : [];
+  const coordFields = document.getElementById('coordinatorEventFields');
+  const openFields  = document.getElementById('openEventFields');
+  const eventSelect = document.getElementById('id_event');
+  const openInputs  = openFields ? openFields.querySelectorAll('input') : [];
 
-    function syncEventTypeFields() {
-        const selected = document.querySelector('input[name="event_type"]:checked');
-        const isOpen = selected && selected.value === 'open';
+  function sync() {
+    const sel    = document.querySelector('input[name="event_type"]:checked');
+    const isOpen = sel && sel.value === 'open';
+    coordFields.style.display = isOpen ? 'none' : '';
+    openFields.style.display  = isOpen ? '' : 'none';
+    if (eventSelect) eventSelect.disabled = isOpen;
+    openInputs.forEach(i => i.disabled = !isOpen);
+  }
 
-        if (coordinatorFields) coordinatorFields.classList.toggle('d-none', isOpen);
-        if (openFields) openFields.classList.toggle('d-none', !isOpen);
-        if (eventSelect) eventSelect.disabled = isOpen;
-        openInputs.forEach((input) => {
-            input.disabled = !isOpen;
-        });
-    }
-
-    document.querySelectorAll('input[name="event_type"]').forEach((input) => {
-        input.addEventListener('change', syncEventTypeFields);
-    });
-    syncEventTypeFields();
+  document.querySelectorAll('input[name="event_type"]').forEach(r => r.addEventListener('change', sync));
+  sync();
 });
 </script>
 {% endblock %}

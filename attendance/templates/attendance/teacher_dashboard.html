@@ -1,223 +1,220 @@
 {% extends 'base.html' %}
-
 {% block title %}Teacher Dashboard — AttendEase{% endblock %}
+{% block page_title %}Teacher Dashboard{% endblock %}
 
 {% block content %}
-<div class="dashboard-header">
-    <div>
-        <h1 class="dashboard-title">Teacher Dashboard</h1>
-        <p class="dashboard-subtitle">Final approval and attendance marking — <strong>{{ teacher_division }}</strong></p>
-    </div>
+
+<!-- Page header -->
+<div class="page-header">
+  <div class="page-header-text">
+    <h1 class="page-title">Attendance Management</h1>
+    <p class="page-subtitle">
+      Final approval and attendance marking &mdash;
+      <strong>{{ teacher_division }}</strong>
+    </p>
+  </div>
+  <!-- Excel export -->
+  <form method="GET" action="{% url 'attendance:teacher_export_excel' %}"
+        class="d-flex align-center gap-2" style="flex-wrap:wrap;">
+    <select name="month" class="form-select" style="width:160px;padding:.4rem .7rem;font-size:.825rem;">
+      {% for value, label in month_choices %}
+        <option value="{{ value }}" {% if export_month == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-secondary">
+      <i class="bi bi-file-earmark-excel"></i> Export Excel
+    </button>
+  </form>
 </div>
 
-<!-- ── Downloads ── -->
-<div class="card data-card mb-4">
-    <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
-        <div>
-            <h5 class="card-title mb-1"><i class="bi bi-download me-2"></i>Download Attendance Records</h5>
-            <p class="text-muted mb-0">Choose a month to export only that month's attendance records.</p>
-        </div>
-        <form method="GET" action="{% url 'attendance:teacher_export_excel' %}" class="teacher-export-form">
-            <select name="month" class="form-select export-month-select" aria-label="Select export month">
-                {% for value, label in month_choices %}
-                    <option value="{{ value }}" {% if export_month == value %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
-            <button type="submit" class="btn btn-success export-excel-btn">
-                <i class="bi bi-file-earmark-excel me-2"></i>Excel
-            </button>
-        </form>
+<!-- Stats -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-icon stat-icon-amber"><i class="bi bi-hourglass-split"></i></div>
+    <div class="stat-body">
+      <div class="stat-value" data-count="{{ stats.awaiting }}">{{ stats.awaiting }}</div>
+      <div class="stat-label">Awaiting</div>
     </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon stat-icon-green"><i class="bi bi-check-circle-fill"></i></div>
+    <div class="stat-body">
+      <div class="stat-value" data-count="{{ stats.approved }}">{{ stats.approved }}</div>
+      <div class="stat-label">Approved</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon stat-icon-red"><i class="bi bi-x-circle-fill"></i></div>
+    <div class="stat-body">
+      <div class="stat-value" data-count="{{ stats.rejected }}">{{ stats.rejected }}</div>
+      <div class="stat-label">Rejected</div>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon stat-icon-cyan"><i class="bi bi-person-check-fill"></i></div>
+    <div class="stat-body">
+      <div class="stat-value" data-count="{{ stats.attended }}">{{ stats.attended }}</div>
+      <div class="stat-label">Attended</div>
+    </div>
+  </div>
 </div>
 
-<!-- ── Stat Cards ── -->
-<div class="row g-4 mb-4">
-    <div class="col-6 col-lg-3">
-        <div class="stat-card stat-pending">
-            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
-            <div class="stat-value" data-count="{{ stats.awaiting }}">{{ stats.awaiting }}</div>
-            <div class="stat-label">Awaiting Approval</div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3">
-        <div class="stat-card stat-approved">
-            <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
-            <div class="stat-value" data-count="{{ stats.approved }}">{{ stats.approved }}</div>
-            <div class="stat-label">Approved</div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3">
-        <div class="stat-card stat-rejected">
-            <div class="stat-icon"><i class="bi bi-x-circle-fill"></i></div>
-            <div class="stat-value" data-count="{{ stats.rejected }}">{{ stats.rejected }}</div>
-            <div class="stat-label">Rejected</div>
-        </div>
-    </div>
-    <div class="col-6 col-lg-3">
-        <div class="stat-card stat-attended">
-            <div class="stat-icon"><i class="bi bi-person-check-fill"></i></div>
-            <div class="stat-value" data-count="{{ stats.attended }}">{{ stats.attended }}</div>
-            <div class="stat-label">Attended</div>
-        </div>
-    </div>
+<!-- Filter bar -->
+<div class="filter-bar">
+  <a href="{% url 'attendance:teacher_dashboard' %}"
+     class="filter-pill {% if not status_filter %}active{% endif %}">All Active</a>
+  <a href="?status=coordinator_approved"
+     class="filter-pill {% if status_filter == 'coordinator_approved' %}active{% endif %}">
+    <i class="bi bi-hourglass-split"></i> Awaiting</a>
+  <a href="?status=teacher_approved"
+     class="filter-pill {% if status_filter == 'teacher_approved' %}active{% endif %}">
+    <i class="bi bi-check-circle"></i> Approved</a>
+  <a href="?status=teacher_rejected"
+     class="filter-pill {% if status_filter == 'teacher_rejected' %}active{% endif %}">
+    <i class="bi bi-x-circle"></i> Rejected</a>
 </div>
 
-<!-- ── Filter Tabs ── -->
-<div class="filter-tabs mb-4">
-    <a href="{% url 'attendance:teacher_dashboard' %}" class="filter-tab {% if not status_filter %}active{% endif %}">
-        All Active
-    </a>
-    <a href="?status=coordinator_approved" class="filter-tab {% if status_filter == 'coordinator_approved' %}active{% endif %}">
-        <i class="bi bi-hourglass-split"></i> Awaiting
-    </a>
-    <a href="?status=teacher_approved" class="filter-tab {% if status_filter == 'teacher_approved' %}active{% endif %}">
-        <i class="bi bi-check-circle"></i> Approved
-    </a>
-    <a href="?status=teacher_rejected" class="filter-tab {% if status_filter == 'teacher_rejected' %}active{% endif %}">
-        <i class="bi bi-x-circle"></i> Rejected
-    </a>
+<!-- Requests table -->
+<div class="card mb-4">
+  <div class="card-header">
+    <h2 class="card-header-title"><i class="bi bi-mortarboard-fill"></i> Requests for Final Approval</h2>
+  </div>
+  <div class="card-body-flush">
+    {% if requests %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Division</th>
+            <th>Event</th>
+            <th>Type</th>
+            <th>Coordinator</th>
+            <th>Status</th>
+            <th>Attendance</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for req in requests %}
+          <tr>
+            <td>
+              <div class="cell-primary">{{ req.student.get_full_name|default:req.student.username }}</div>
+              <div class="cell-secondary">{{ req.student.student_id }} &middot; {{ req.student.department }}</div>
+            </td>
+            <td><span class="badge badge-brand">{{ req.student.get_division_display|default:"—" }}</span></td>
+            <td>
+              <div class="cell-primary">{{ req.display_event_name }}</div>
+              <div class="cell-secondary">{{ req.display_event_date|date:"d M Y" }} &middot; {{ req.display_event_venue }}</div>
+            </td>
+            <td>
+              {% if req.event_type == 'open' %}
+                <span class="badge badge-brand">Open</span>
+              {% else %}
+                <span class="badge badge-neutral">Internal</span>
+              {% endif %}
+            </td>
+            <td style="font-size:.775rem;">
+              {% if req.event_type == 'open' %}
+                <span style="color:var(--text-muted);">Direct to teacher</span>
+              {% elif req.coordinator %}
+                <span style="color:var(--success);">
+                  <i class="bi bi-check-circle-fill"></i>
+                  {{ req.coordinator.get_full_name|default:req.coordinator.username }}
+                </span>
+              {% else %}—{% endif %}
+            </td>
+            <td>
+              {% if req.status == 'coordinator_approved' %}
+                <span class="badge badge-progress">Awaiting</span>
+              {% elif req.status == 'teacher_approved' %}
+                <span class="badge badge-approved">Approved</span>
+              {% elif req.status == 'teacher_rejected' %}
+                <span class="badge badge-rejected">Rejected</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if req.is_attended %}
+                <span class="badge badge-approved"><i class="bi bi-check-lg"></i> Attended</span>
+              {% elif req.status == 'teacher_approved' %}
+                <form method="POST" action="{% url 'attendance:mark_attendance' req.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-person-check"></i> Mark
+                  </button>
+                </form>
+              {% else %}
+                <span style="color:var(--text-muted);">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if req.status == 'coordinator_approved' %}
+              <a href="{% url 'attendance:teacher_review' req.pk %}" class="btn btn-primary btn-sm">
+                <i class="bi bi-pencil-square"></i> Review
+              </a>
+              {% else %}
+              <span style="font-size:.775rem;color:var(--text-muted);">Reviewed</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
+      <h5>No requests found</h5>
+      <p>No coordinator-approved requests at the moment.</p>
+    </div>
+    {% endif %}
+  </div>
 </div>
 
-<!-- ── Requests Table ── -->
-<div class="card data-card">
-    <div class="card-header">
-        <h5 class="card-title mb-0"><i class="bi bi-mortarboard-fill me-2"></i>Requests for Final Approval</h5>
+<!-- Student activity table -->
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-header-title"><i class="bi bi-bar-chart-fill"></i> Student Activity — {{ teacher_division }}</h2>
+  </div>
+  <div class="card-body-flush">
+    {% if student_activity %}
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Student</th>
+            <th>Roll No</th>
+            <th>Total</th>
+            <th>Pending</th>
+            <th>Approved</th>
+            <th>Rejected</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for student in student_activity %}
+          <tr>
+            <td>
+              <div class="cell-primary">{{ student.get_full_name|default:student.username }}</div>
+              <div class="cell-secondary">{{ student.department|default:"—" }}</div>
+            </td>
+            <td style="font-size:.825rem;">{{ student.student_id|default:"—" }}</td>
+            <td><span class="badge badge-brand">{{ student.total_requests }}</span></td>
+            <td><span class="badge badge-pending">{{ student.pending_requests }}</span></td>
+            <td><span class="badge badge-approved">{{ student.approved_requests }}</span></td>
+            <td><span class="badge badge-rejected">{{ student.rejected_requests }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    <div class="card-body p-0">
-        {% if requests %}
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0" id="teacherTable">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Division</th>
-                        <th>Event</th>
-                        <th>Type</th>
-                        <th>Coordinator</th>
-                        <th>Status</th>
-                        <th>Attendance</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for req in requests %}
-                    <tr>
-                        <td>
-                            <div class="fw-semibold">{{ req.student.get_full_name|default:req.student.username }}</div>
-                            <small class="text-muted">{{ req.student.student_id }} · {{ req.student.department }}</small>
-                        </td>
-                        <td>
-                            <span class="badge bg-info text-dark">{{ req.student.get_division_display|default:"—" }}</span>
-                        </td>
-                        <td>
-                            <div>{{ req.display_event_name }}</div>
-                            <small class="text-muted">{{ req.display_event_date|date:"d/m/Y" }} · {{ req.display_event_venue }}</small>
-                        </td>
-                        <td>
-                            <span class="badge {% if req.event_type == 'open' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
-                                {{ req.get_event_type_display }}
-                            </span>
-                        </td>
-                        <td>
-                            <small>
-                                {% if req.event_type == 'open' %}
-                                    <span class="text-muted"><i class="bi bi-arrow-right-circle"></i> Direct to teacher</span>
-                                {% elif req.coordinator %}
-                                    <span class="text-success"><i class="bi bi-check-circle"></i> {{ req.coordinator.get_full_name|default:req.coordinator.username }}</span>
-                                    {% if req.coordinator_remarks %}
-                                        <br><em class="text-muted">"{{ req.coordinator_remarks|truncatewords:8 }}"</em>
-                                    {% endif %}
-                                {% else %}
-                                    —
-                                {% endif %}
-                            </small>
-                        </td>
-                        <td>
-                            <span class="status-badge status-{{ req.status }}">
-                                {{ req.get_status_display }}
-                            </span>
-                        </td>
-                        <td>
-                            {% if req.is_attended %}
-                                <span class="badge bg-success"><i class="bi bi-check-lg"></i> Attended</span>
-                            {% elif req.status == 'teacher_approved' %}
-                                <form method="POST" action="{% url 'attendance:mark_attendance' req.pk %}" class="d-inline">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-sm btn-success" title="Mark as attended">
-                                        <i class="bi bi-person-check"></i> Mark
-                                    </button>
-                                </form>
-                            {% else %}
-                                <span class="text-muted">—</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if req.status == 'coordinator_approved' %}
-                            <a href="{% url 'attendance:teacher_review' req.pk %}" class="btn btn-sm btn-primary">
-                                <i class="bi bi-pencil-square"></i> Review
-                            </a>
-                            {% else %}
-                            <span class="text-muted small">Reviewed</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <i class="bi bi-inbox"></i>
-            <h5>No requests found</h5>
-            <p>There are no coordinator-approved requests at the moment.</p>
-        </div>
-        {% endif %}
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-state-icon"><i class="bi bi-bar-chart"></i></div>
+      <h5>No student activity yet</h5>
+      <p>Students who submit requests will appear here.</p>
     </div>
+    {% endif %}
+  </div>
 </div>
 
-<!-- ── Student Activity Overview ── -->
-<div class="card data-card mt-4">
-    <div class="card-header">
-        <h5 class="card-title mb-0"><i class="bi bi-bar-chart-fill me-2"></i>Student Request Activity</h5>
-    </div>
-    <div class="card-body p-0">
-        {% if student_activity %}
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Roll No</th>
-                        <th>Total Requests</th>
-                        <th>Pending</th>
-                        <th>Approved</th>
-                        <th>Rejected</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student in student_activity %}
-                    <tr>
-                        <td>
-                            <div class="fw-semibold">{{ student.get_full_name|default:student.username }}</div>
-                            <small class="text-muted">{{ student.department|default:"—" }}</small>
-                        </td>
-                        <td>{{ student.student_id|default:"—" }}</td>
-                        <td><span class="badge bg-primary">{{ student.total_requests }}</span></td>
-                        <td><span class="badge bg-warning text-dark">{{ student.pending_requests }}</span></td>
-                        <td><span class="badge bg-success">{{ student.approved_requests }}</span></td>
-                        <td><span class="badge bg-danger">{{ student.rejected_requests }}</span></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <i class="bi bi-bar-chart"></i>
-            <h5>No student activity yet</h5>
-            <p>Students who submit requests will appear here with their request counts.</p>
-        </div>
-        {% endif %}
-    </div>
-</div>
 {% endblock %}

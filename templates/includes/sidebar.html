@@ -1,77 +1,90 @@
-<!-- Sidebar Navigation — role-aware links -->
 <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <div class="sidebar-brand">
-            <i class="bi bi-calendar-check-fill brand-icon"></i>
-            <span class="brand-text">AttendEase</span>
-        </div>
-        <button class="sidebar-close d-lg-none" id="sidebarClose">
-            <i class="bi bi-x-lg"></i>
-        </button>
+
+  <!-- Brand -->
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon">
+      <i class="bi bi-calendar-check-fill"></i>
+    </div>
+    <span class="sidebar-brand-name">AttendEase</span>
+    <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">
+      <i class="bi bi-x-lg"></i>
+    </button>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+
+    {% if user.is_student %}
+    <div class="nav-section">
+      <span class="nav-section-label">Student</span>
+      <a href="{% url 'attendance:student_dashboard' %}"
+         class="nav-item {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
+        <i class="bi bi-grid-fill"></i> Dashboard
+      </a>
+      <a href="{% url 'attendance:submit_request' %}"
+         class="nav-item {% if request.resolver_match.url_name == 'submit_request' %}active{% endif %}">
+        <i class="bi bi-send-fill"></i> Submit Request
+      </a>
+      <a href="{% url 'events:event_list' %}"
+         class="nav-item {% if request.resolver_match.url_name == 'event_list' %}active{% endif %}">
+        <i class="bi bi-calendar-event-fill"></i> Events
+      </a>
     </div>
 
-    <nav class="sidebar-nav">
-        <div class="nav-section-title">Main</div>
-
-        {% if user.is_student %}
-        <!-- ── Student Navigation ── -->
-        <a href="{% url 'attendance:student_dashboard' %}" class="nav-link-item {% if request.resolver_match.url_name == 'student_dashboard' %}active{% endif %}">
-            <i class="bi bi-grid-1x2-fill"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="{% url 'attendance:submit_request' %}" class="nav-link-item {% if request.resolver_match.url_name == 'submit_request' %}active{% endif %}">
-            <i class="bi bi-plus-circle-fill"></i>
-            <span>Submit Request</span>
-        </a>
-        <a href="{% url 'events:event_list' %}" class="nav-link-item {% if request.resolver_match.url_name == 'event_list' %}active{% endif %}">
-            <i class="bi bi-calendar-event-fill"></i>
-            <span>Events</span>
-        </a>
-
-        {% elif user.is_coordinator %}
-        <!-- ── Coordinator Navigation ── -->
-        <a href="{% url 'attendance:coordinator_dashboard' %}" class="nav-link-item {% if request.resolver_match.url_name == 'coordinator_dashboard' %}active{% endif %}">
-            <i class="bi bi-grid-1x2-fill"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="{% url 'events:event_list' %}" class="nav-link-item {% if request.resolver_match.url_name == 'event_list' %}active{% endif %}">
-            <i class="bi bi-calendar-event-fill"></i>
-            <span>Events</span>
-        </a>
-        <a href="{% url 'events:event_create' %}" class="nav-link-item {% if request.resolver_match.url_name == 'event_create' %}active{% endif %}">
-            <i class="bi bi-plus-circle-fill"></i>
-            <span>Create Event</span>
-        </a>
-
-        {% elif user.is_teacher %}
-        <!-- ── Teacher Navigation ── -->
-        <a href="{% url 'attendance:teacher_dashboard' %}" class="nav-link-item {% if request.resolver_match.url_name == 'teacher_dashboard' %}active{% endif %}">
-            <i class="bi bi-grid-1x2-fill"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="{% url 'events:event_list' %}" class="nav-link-item {% if request.resolver_match.url_name == 'event_list' %}active{% endif %}">
-            <i class="bi bi-calendar-event-fill"></i>
-            <span>Events</span>
-        </a>
-        {% endif %}
-
-        <div class="nav-section-title" style="margin-top: 0.75rem;">Info</div>
-        <a href="{% url 'about' %}" class="nav-link-item {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
-            <i class="bi bi-info-circle-fill"></i>
-            <span>About</span>
-        </a>
-    </nav>
-
-    <!-- Sidebar Footer — User Info -->
-    <div class="sidebar-footer">
-        <div class="user-card">
-            <div class="user-avatar">
-                {{ user.first_name|default:user.username|make_list|first|upper }}
-            </div>
-            <div class="user-info">
-                <div class="user-name">{{ user.first_name|default:user.username }} {{ user.last_name }}</div>
-                <div class="user-role">{{ user.get_role_display }}</div>
-            </div>
-        </div>
+    {% elif user.is_coordinator %}
+    <div class="nav-section">
+      <span class="nav-section-label">Coordinator</span>
+      <a href="{% url 'attendance:coordinator_dashboard' %}"
+         class="nav-item {% if request.resolver_match.url_name == 'coordinator_dashboard' %}active{% endif %}">
+        <i class="bi bi-grid-fill"></i> Dashboard
+      </a>
+      <a href="{% url 'events:event_list' %}"
+         class="nav-item {% if request.resolver_match.url_name == 'event_list' %}active{% endif %}">
+        <i class="bi bi-calendar-event-fill"></i> Events
+      </a>
+      <a href="{% url 'events:event_create' %}"
+         class="nav-item {% if request.resolver_match.url_name == 'event_create' %}active{% endif %}">
+        <i class="bi bi-plus-circle-fill"></i> Create Event
+      </a>
     </div>
+
+    {% elif user.is_teacher %}
+    <div class="nav-section">
+      <span class="nav-section-label">Teacher</span>
+      <a href="{% url 'attendance:teacher_dashboard' %}"
+         class="nav-item {% if request.resolver_match.url_name == 'teacher_dashboard' %}active{% endif %}">
+        <i class="bi bi-grid-fill"></i> Dashboard
+      </a>
+      <a href="{% url 'events:event_list' %}"
+         class="nav-item {% if request.resolver_match.url_name == 'event_list' %}active{% endif %}">
+        <i class="bi bi-calendar-event-fill"></i> Events
+      </a>
+    </div>
+    {% endif %}
+
+    <div class="nav-section">
+      <span class="nav-section-label">General</span>
+      <a href="{% url 'about' %}"
+         class="nav-item {% if request.resolver_match.url_name == 'about' %}active{% endif %}">
+        <i class="bi bi-info-circle-fill"></i> About
+      </a>
+    </div>
+
+  </nav>
+
+  <!-- Footer -->
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="sidebar-user-avatar">
+        {{ user.first_name|default:user.username|slice:":1"|upper }}
+      </div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-user-name">
+          {{ user.get_full_name|default:user.username }}
+        </div>
+        <div class="sidebar-user-role">{{ user.get_role_display }}</div>
+      </div>
+    </div>
+  </div>
+
 </aside>

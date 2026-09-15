@@ -1,127 +1,165 @@
 {% extends 'base.html' %}
-
 {% block title %}{{ title }} — AttendEase{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div class="dashboard-header">
-    <div>
-        <h1 class="dashboard-title">{{ title }}</h1>
-        <p class="dashboard-subtitle">Review this attendance request</p>
-    </div>
-    {% if role == 'coordinator' %}
-    <a href="{% url 'attendance:coordinator_dashboard' %}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-2"></i>Back
+
+<div class="page-header">
+  <div class="page-header-text">
+    <h1 class="page-title">{{ title }}</h1>
+    <p class="page-subtitle">Review the request details before taking action</p>
+  </div>
+  {% if role == 'coordinator' %}
+    <a href="{% url 'attendance:coordinator_dashboard' %}" class="btn btn-secondary">
+      <i class="bi bi-arrow-left"></i> Back
     </a>
-    {% elif role == 'teacher' %}
-    <a href="{% url 'attendance:teacher_dashboard' %}" class="btn btn-outline-secondary">
-        <i class="bi bi-arrow-left me-2"></i>Back
+  {% else %}
+    <a href="{% url 'attendance:teacher_dashboard' %}" class="btn btn-secondary">
+      <i class="bi bi-arrow-left"></i> Back
     </a>
-    {% endif %}
+  {% endif %}
 </div>
 
 <div class="row g-4">
-    <!-- Request Info -->
-    <div class="col-lg-7">
-        <div class="card data-card">
-            <div class="card-header">
-                <h5 class="card-title mb-0"><i class="bi bi-file-text-fill me-2"></i>Request Details</h5>
-            </div>
-            <div class="card-body">
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <div class="detail-label">Student</div>
-                        <div class="detail-value">
-                            {{ att_request.student.get_full_name|default:att_request.student.username }}
-                            {% if att_request.student.student_id %}
-                                <span class="text-muted">({{ att_request.student.student_id }})</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Department</div>
-                        <div class="detail-value">{{ att_request.student.department|default:"—" }}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Event</div>
-                        <div class="detail-value">{{ att_request.display_event_name }}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Event Type</div>
-                        <div class="detail-value">{{ att_request.get_event_type_display }}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Event Date</div>
-                        <div class="detail-value">
-                            {{ att_request.display_event_date|date:"d/m/Y" }}
-                            {% if att_request.display_event_time %} at {{ att_request.display_event_time|time:"h:i A" }}{% endif %}
-                        </div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Venue</div>
-                        <div class="detail-value">{{ att_request.display_event_venue }}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Submitted</div>
-                        <div class="detail-value">{{ att_request.created_at|date:"d/m/Y h:i A" }}</div>
-                    </div>
-                </div>
 
-                <hr>
+  <!-- Left: request info -->
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-header-title"><i class="bi bi-file-text-fill"></i> Request Information</h2>
+        {% if att_request.status == 'pending' %}
+          <span class="badge badge-pending">Pending</span>
+        {% elif att_request.status == 'coordinator_approved' %}
+          <span class="badge badge-progress">Coordinator Approved</span>
+        {% endif %}
+      </div>
+      <div class="card-body">
 
-                <div>
-                    <div class="detail-label mb-2">Reason for attending</div>
-                    <div class="p-3 bg-light rounded">{{ att_request.reason }}</div>
-                </div>
-
-                {% if att_request.event_type == 'open' and role == 'teacher' %}
-                <hr>
-                <div class="alert alert-info mb-0">
-                    <i class="bi bi-arrow-right-circle me-2"></i>
-                    This open event request was sent directly to you.
-                </div>
-                {% elif att_request.coordinator_remarks and role == 'teacher' %}
-                <hr>
-                <div>
-                    <div class="detail-label mb-2">Coordinator Remarks</div>
-                    <div class="p-3 bg-light rounded">
-                        <em>"{{ att_request.coordinator_remarks }}"</em>
-                        <br><small class="text-muted">— {{ att_request.coordinator.get_full_name|default:att_request.coordinator.username }}</small>
-                    </div>
-                </div>
+        <!-- Student -->
+        <div class="form-section">
+          <div class="form-section-title"><i class="bi bi-person-fill"></i> Student</div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Name</div>
+              <div class="detail-value">
+                {{ att_request.student.get_full_name|default:att_request.student.username }}
+                {% if att_request.student.student_id %}
+                  <span style="font-weight:400;color:var(--text-muted);"> ({{ att_request.student.student_id }})</span>
                 {% endif %}
+              </div>
             </div>
+            <div class="detail-item">
+              <div class="detail-label">Division</div>
+              <div class="detail-value">{{ att_request.student.get_division_display|default:"—" }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Department</div>
+              <div class="detail-value">{{ att_request.student.department|default:"—" }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Grade</div>
+              <div class="detail-value">{{ att_request.student.get_grade_display|default:"—" }}</div>
+            </div>
+          </div>
         </div>
-    </div>
 
-    <!-- Review Action Panel -->
-    <div class="col-lg-5">
-        <div class="card data-card border-primary">
-            <div class="card-header bg-primary bg-opacity-10">
-                <h5 class="card-title mb-0 text-primary">
-                    <i class="bi bi-clipboard-check me-2"></i>Your Decision
-                </h5>
+        <hr class="section-divider">
+
+        <!-- Event -->
+        <div class="form-section">
+          <div class="form-section-title"><i class="bi bi-calendar-event-fill"></i> Event</div>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <div class="detail-label">Event Name</div>
+              <div class="detail-value">{{ att_request.display_event_name }}</div>
             </div>
-            <div class="card-body">
-                <form method="POST" id="reviewForm">
-                    {% csrf_token %}
-
-                    <div class="mb-4">
-                        <label class="form-label fw-semibold">Remarks</label>
-                        {{ form.remarks }}
-                        <div class="form-text">Optional — add any comments about your decision.</div>
-                    </div>
-
-                    <div class="d-grid gap-2">
-                        <button type="submit" name="action" value="approve" class="btn btn-success btn-lg" id="approveBtn">
-                            <i class="bi bi-check-circle-fill me-2"></i>Approve Request
-                        </button>
-                        <button type="submit" name="action" value="reject" class="btn btn-danger btn-lg" id="rejectBtn">
-                            <i class="bi bi-x-circle-fill me-2"></i>Reject Request
-                        </button>
-                    </div>
-                </form>
+            <div class="detail-item">
+              <div class="detail-label">Type</div>
+              <div class="detail-value">{{ att_request.get_event_type_display }}</div>
             </div>
+            <div class="detail-item">
+              <div class="detail-label">Date</div>
+              <div class="detail-value">
+                {{ att_request.display_event_date|date:"d M Y"|default:"—" }}
+                {% if att_request.display_event_time %} at {{ att_request.display_event_time|time:"h:i A" }}{% endif %}
+              </div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Venue</div>
+              <div class="detail-value">{{ att_request.display_event_venue|default:"—" }}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Submitted</div>
+              <div class="detail-value">{{ att_request.created_at|date:"d M Y, h:i A" }}</div>
+            </div>
+          </div>
         </div>
+
+        <hr class="section-divider">
+
+        <!-- Reason -->
+        <div>
+          <div class="detail-label" style="margin-bottom:.5rem;">Reason for Attending</div>
+          <div class="reason-block">{{ att_request.reason }}</div>
+        </div>
+
+        <!-- Coordinator remarks (shown to teacher) -->
+        {% if role == 'teacher' and att_request.coordinator_remarks %}
+        <hr class="section-divider">
+        <div>
+          <div class="detail-label" style="margin-bottom:.5rem;">Coordinator Remarks</div>
+          <div class="reason-block" style="border-left:3px solid var(--brand);padding-left:1rem;">
+            &ldquo;{{ att_request.coordinator_remarks }}&rdquo;
+            <div style="font-size:.775rem;color:var(--text-muted);margin-top:.35rem;">
+              — {{ att_request.coordinator.get_full_name|default:att_request.coordinator.username }}
+            </div>
+          </div>
+        </div>
+        {% elif role == 'teacher' and att_request.event_type == 'open' %}
+        <hr class="section-divider">
+        <div class="alert alert-info" style="margin-bottom:0;">
+          <i class="bi bi-arrow-right-circle-fill"></i>
+          <div>This is an open event — it was sent directly to you, skipping coordinator review.</div>
+        </div>
+        {% endif %}
+
+      </div>
     </div>
+  </div>
+
+  <!-- Right: decision panel -->
+  <div class="col-lg-5">
+    <div class="card" style="border-color:var(--brand-border);">
+      <div class="card-header" style="background:var(--brand-muted);">
+        <h2 class="card-header-title" style="color:var(--brand);">
+          <i class="bi bi-clipboard-check-fill"></i> Your Decision
+        </h2>
+      </div>
+      <div class="card-body">
+        <form method="POST" id="reviewForm">
+          {% csrf_token %}
+
+          <div class="form-group">
+            <label class="form-label">Remarks <span style="font-weight:400;color:var(--text-muted);">(optional)</span></label>
+            {{ form.remarks }}
+            <div class="form-text">Your remarks will be visible to the student.</div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:.625rem;margin-top:1.25rem;">
+            <button type="submit" name="action" value="approve"
+                    class="btn btn-success btn-full btn-lg">
+              <i class="bi bi-check-circle-fill"></i> Approve Request
+            </button>
+            <button type="submit" name="action" value="reject"
+                    class="btn btn-danger btn-full btn-lg">
+              <i class="bi bi-x-circle-fill"></i> Reject Request
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
 </div>
+
 {% endblock %}
