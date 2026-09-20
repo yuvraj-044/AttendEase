@@ -1,0 +1,132 @@
+"""
+Authentication views: login, logout, register, dashboard redirect.
+
+Registration creates the user in both Supabase Auth and Django's CustomUser.
+Login authenticates via the Supabase backend (see backends.py).
+Logout clears both Django session and Supabase session.
+"""
+
+import logging
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .forms import CustomUserCreationForm, CustomLoginForm
+from .backends import get_supabase_client
+
+logger = logging.getLogger(__name__)
+
+
+def register_view(request):
+    """
+    Handle user registration.
+    1. Validate the Django form.
+    2. Create the user in Supabase Auth (email + password).
+    3. Save the Django CustomUser with role, division, etc.
+    4. Log the user in.
+    """
+    if request.user.is_authenticated:
+        return redirect('users:redirect_dashboard')
+
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password1']
+
+            # Step 1: Create user in Supabase Auth
+            supabase_user_created = False
+            supabase = get_supabase_client()
+
+            if supabase:
+                try:
+                    supabase_response = supabase.auth.sign_up({
+                        'email': email,
+                        'password': password,
+                    })
+                    if supabase_response and supabase_response.user:
+                        supabase_user_created = True
+                        logger.info(f'Supabase user created for {email}')
+                except Exception as e:
+                    logger.error(f'Supabase sign_up failed for {email}: {e}')
+                    messages.warning(
+                        request,
+                        'Account created locally. Supabase sync will retry on next login.'
+                    )
+            else:
+                logger.warning('Supabase not configured. Creating local-only user.')
+
+            # Step 2: Create Django user regardless of Supabase result
+            user = form.save()
+
+            # Step 3: Log the user in via Django
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(
+                request,
+                f'Welcome to AttendEase, {user.first_name or user.username}!'
+            )
+            return redirect('users:redirect_dashboard')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = CustomUserCreationForm()
+
+    return render(request, 'users/register.html', {'form': form})
+
+
+def login_view(request):
+    """
+    Handle user login.
+    Tries Supabase auth backend first, falls back to Django ModelBackend.
+    """
+    if request.user.is_authenticated:
+        return redirect('users:redirect_dashboard')
+
+    if request.method == 'POST':
+        form = CustomLoginForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            messages.success(request, f'Welcome back, {user.first_name or user.username}!')
+            return redirect('users:redirect_dashboard')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    else:
+        form = CustomLoginForm()
+
+    return render(request, 'users/login.html', {'form': form})
+
+
+def logout_view(request):
+    """
+    Log out the user from both Django and Supabase.
+    """
+    # Sign out from Supabase (best-effort)
+    supabase = get_supabase_client()
+    if supabase:
+        try:
+            supabase.auth.sign_out()
+        except Exception as e:
+            logger.debug(f'Supabase sign_out failed (non-critical): {e}')
+
+    logout(request)
+    messages.info(request, 'You have been logged out successfully.')
+    return redirect('users:login')
+
+
+@login_required
+def redirect_dashboard(request):
+    """
+    Redirect users to their role-specific dashboard.
+    This is the central routing point after login.
+    """
+    user = request.user
+    if user.is_student:
+        return redirect('attendance:student_dashboard')
+    elif user.is_coordinator:
+        return redirect('attendance:coordinator_dashboard')
+    elif user.is_teacher:
+        return redirect('attendance:teacher_dashboard')
+    else:
+        # Fallback for superusers or unknown roles
+        return redirect('attendance:student_dashboard')

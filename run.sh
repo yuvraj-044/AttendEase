@@ -16,7 +16,7 @@ fi
 
 # Install dependencies if needed
 echo "📦 Checking dependencies..."
-pip3 install -q -r requirements.txt
+pip3 install -q -r requirements/local.txt
 
 # Run migrations
 echo "⚙️  Applying migrations..."

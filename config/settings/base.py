@@ -1,19 +1,33 @@
 """
 Django settings for AttendEase project.
 Event Attendance Management System
+
+Base settings — shared across all environments.
+Environment-specific overrides go in local.py / production.py.
 """
 
 import os
 from pathlib import Path
+import sys
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Load environment variables from .env file
+load_dotenv(BASE_DIR / '.env')
+
+# Add apps/ to the Python path so Django can find the apps
+sys.path.insert(0, str(BASE_DIR / 'apps'))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-attendease-dev-key-change-in-production'
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-attendease-dev-key-change-in-production'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 
 ALLOWED_HOSTS = ['*']
 
@@ -61,11 +75,18 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database — SQLite for development
+# Database — Supabase PostgreSQL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('SUPABASE_DB_NAME', 'postgres'),
+        'USER': os.environ.get('SUPABASE_DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('SUPABASE_DB_PASSWORD', ''),
+        'HOST': os.environ.get('SUPABASE_DB_HOST', 'localhost'),
+        'PORT': os.environ.get('SUPABASE_DB_PORT', '5432'),
+        'OPTIONS': {
+            'connect_timeout': 10,
+        },
     }
 }
 
@@ -93,10 +114,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom User model
 AUTH_USER_MODEL = 'users.CustomUser'
 
+# Authentication backends — Supabase + Django default fallback
+AUTHENTICATION_BACKENDS = [
+    'users.backends.SupabaseAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # Authentication URLs
 LOGIN_URL = 'users:login'
 LOGIN_REDIRECT_URL = 'users:redirect_dashboard'
 LOGOUT_REDIRECT_URL = 'users:login'
+
+# Supabase configuration
+SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
+SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY', '')
 
 # Messages framework — Bootstrap 5 alert class mapping
 from django.contrib.messages import constants as messages

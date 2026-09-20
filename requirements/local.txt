@@ -1,0 +1,3 @@
+-r base.txt
+# Add dev tools here, e.g.
+# django-debug-toolbar
