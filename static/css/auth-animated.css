@@ -1,0 +1,687 @@
+/* ============================================================
+   AttendEase — VERSO Component 91 Authentication Card
+   Exact Replica of the Reference Card with AttendEase Blue Theme
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --v-font-serif: 'Cormorant Garamond', Georgia, serif;
+  --v-font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --v-font-heading: 'Outfit', sans-serif;
+
+  /* Stage background (dark ambient atmosphere like Component 91 demo) */
+  --v-stage-bg: #091122;
+
+  /* Card colors */
+  --v-form-bg: #fbfbf9;         /* Warm clean off-white like in the image */
+  --v-brand-bg-1: #061938;      /* Deep midnight blue gradient top */
+  --v-brand-bg-2: #092c63;      /* Rich royal navy */
+  --v-brand-bg-3: #0c3e8a;      /* Glowing blue bottom */
+  
+  --v-blade-color: #0c3370;
+  --v-accent-gold: #c5a059;     /* Subtle warm gold accent for title bar & underlines */
+
+  --v-btn-primary: #103b75;     /* Dark navy pill button like screenshot */
+  --v-btn-primary-hover: #174ea6;
+
+  --v-input-border: #e2e4e8;
+  --v-input-text: #1e293b;
+  --v-input-placeholder: #94a3b8;
+}
+
+/* ── Fullscreen Dark Stage ─────────────────────────────────── */
+.verso-stage {
+  min-height: 100vh;
+  width: 100%;
+  background: var(--v-stage-bg);
+  background-image: 
+    radial-gradient(at 10% 20%, rgba(13, 56, 126, 0.4) 0px, transparent 50%),
+    radial-gradient(at 90% 80%, rgba(9, 44, 99, 0.5) 0px, transparent 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  font-family: var(--v-font-sans);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Ambient glow orbs */
+.stage-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  pointer-events: none;
+  opacity: 0.35;
+}
+.stage-glow--1 {
+  width: 500px;
+  height: 500px;
+  background: #1d4ed8;
+  top: -100px;
+  right: -50px;
+}
+.stage-glow--2 {
+  width: 400px;
+  height: 400px;
+  background: #0284c7;
+  bottom: -80px;
+  left: -50px;
+}
+
+/* ── Center Card Container ──────────────────────────────────── */
+.verso-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 980px;
+  position: relative;
+  z-index: 10;
+}
+
+/* ── The Master VERSO Card (Exactly like Screenshot) ────────── */
+.verso-card {
+  width: 100%;
+  height: 580px;
+  background: var(--v-form-bg);
+  border-radius: 28px;
+  box-shadow: 
+    0 25px 60px -15px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.08);
+  position: relative;
+  display: flex;
+  overflow: hidden; /* Clips the slanted blade */
+  transition: all 0.7s cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* ── Two Halves ─────────────────────────────────────────────── */
+.verso-card__side {
+  height: 100%;
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+}
+
+/* Left Form Area */
+.verso-card__side--form {
+  width: 48%;
+  background: var(--v-form-bg);
+  padding: 3.5rem 3.5rem 2.5rem 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 5;
+}
+
+/* Right Rich Blue Area */
+.verso-card__side--brand {
+  width: 52%;
+  background: linear-gradient(155deg, var(--v-brand-bg-1) 0%, var(--v-brand-bg-2) 45%, var(--v-brand-bg-3) 100%);
+  padding: 4rem 3rem 3.5rem 5.5rem;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  z-index: 3;
+}
+
+/* ── Authentic Diagonal Blade Cut (Component 91) ───────────── */
+.verso-blade {
+  position: absolute;
+  top: -15%;
+  bottom: -15%;
+  left: 45%;
+  width: 64px;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(
+    170deg,
+    #051838 0%,
+    #0a306c 40%,
+    #174ea6 60%,
+    #0a2856 100%
+  );
+  transform: skewX(-7deg);
+  transition: transform 0.75s cubic-bezier(0.77, 0, 0.175, 1),
+              left 0.75s cubic-bezier(0.77, 0, 0.175, 1);
+  box-shadow: 
+    -15px 0 35px rgba(0, 0, 0, 0.4),
+     15px 0 35px rgba(13, 71, 161, 0.3);
+}
+
+.blade-shimmer {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.25) 50%,
+    transparent 100%
+  );
+  animation: bladePulse 6s ease-in-out infinite;
+}
+
+@keyframes bladePulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.8; }
+}
+
+/* ── Mode Toggle Mechanics: Slide across the card ───────────── */
+.verso-card.mode-signup .verso-blade {
+  left: 46%;
+  transform: skewX(7deg);
+}
+
+/* ── FORM PANES (Sign In vs Sign Up) ────────────────────────── */
+.card-pane {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  animation: fadeInPane 0.35s ease;
+}
+
+#paneSignin {
+  display: flex;
+}
+
+.verso-card.mode-signup #paneSignin {
+  display: none;
+}
+.verso-card.mode-signup #paneSignup {
+  display: flex;
+  overflow-y: auto;
+  max-height: 480px;
+  padding-right: 0.5rem;
+}
+
+/* Scrollbar for signup form */
+#paneSignup::-webkit-scrollbar { width: 4px; }
+#paneSignup::-webkit-scrollbar-track { background: transparent; }
+#paneSignup::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+@keyframes fadeInPane {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Form Heading like Reference ────────────────────────────── */
+.form-hero {
+  margin-bottom: 2rem;
+}
+
+.form-title {
+  font-family: var(--v-font-heading);
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.4rem 0;
+  letter-spacing: -0.02em;
+}
+
+.title-bar {
+  width: 44px;
+  height: 3.5px;
+  background: var(--v-accent-gold);
+  border-radius: 2px;
+}
+
+/* ── Input Fields matching Screenshot Style ─────────────────── */
+.v-field {
+  position: relative;
+  margin-bottom: 1.15rem;
+  width: 100%;
+}
+
+.v-input, .v-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 2.5rem 0.75rem 0.85rem;
+  font-family: var(--v-font-sans);
+  font-size: 0.875rem;
+  color: var(--v-input-text);
+  background: #ffffff;
+  border: 1.5px solid var(--v-input-border);
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.v-input::placeholder {
+  color: var(--v-input-placeholder);
+  font-weight: 400;
+}
+
+.v-input:focus, .v-select:focus {
+  border-color: #1d4ed8;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.v-field-icon, .v-field-action {
+  position: absolute;
+  right: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+
+.v-field-action {
+  pointer-events: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.v-field-action:hover {
+  color: #1e293b;
+}
+
+/* Form Two Column Rows */
+.v-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+/* ── Role Selector Pill Tabs ────────────────────────────────── */
+.v-role-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+  background: #f1f5f9;
+  padding: 0.25rem;
+  border-radius: 10px;
+}
+
+.v-role-tab {
+  flex: 1;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.45rem 0.25rem;
+  border-radius: 8px;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.v-role-tab.active {
+  background: #ffffff;
+  color: #1e40af;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Checkbox & Forgot Link (Like Screenshot) ───────────────── */
+.v-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.8rem;
+}
+
+.v-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #475569;
+  cursor: pointer;
+  user-select: none;
+}
+
+.v-checkbox {
+  accent-color: #103b75;
+  width: 15px;
+  height: 15px;
+  cursor: pointer;
+}
+
+.v-link {
+  color: #c5a059;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.v-link:hover {
+  color: #9a7836;
+}
+
+/* ── Pill Submit Button (Identical to Screenshot) ────────────── */
+.v-btn-submit {
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  background: var(--v-btn-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 9999px; /* Full pill */
+  font-family: var(--v-font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(16, 59, 117, 0.4);
+  transition: all 0.2s ease;
+  margin-bottom: 1.5rem;
+}
+
+.v-btn-submit:hover {
+  background: var(--v-btn-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(16, 59, 117, 0.5);
+}
+
+.v-btn-submit:active {
+  transform: translateY(0);
+}
+
+.v-btn-submit--signup {
+  border-radius: 10px;
+}
+
+/* ── Switch Prompt at Bottom of Form ────────────────────────── */
+.v-switch-cta {
+  font-size: 0.825rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.v-switch-link {
+  color: #0f172a;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.v-switch-link:hover {
+  color: #1d4ed8;
+}
+
+.v-error {
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin-top: -0.6rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.v-error--block {
+  padding: 0.6rem 0.85rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* ============================================================
+   RIGHT VERSO BLUE SHOWCASE (Exact Typography & Aesthetics)
+   ============================================================ */
+.brand-showcase {
+  display: none;
+  flex-direction: column;
+  animation: fadeInPane 0.4s ease;
+}
+
+#brandShowcaseSignin {
+  display: flex;
+}
+
+.verso-card.mode-signup #brandShowcaseSignin {
+  display: none;
+}
+.verso-card.mode-signup #brandShowcaseSignup {
+  display: flex;
+}
+
+.brand-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 1.5rem;
+}
+
+.brand-title {
+  font-family: var(--v-font-serif);
+  font-size: 3.5rem;
+  font-weight: 400;
+  line-height: 1.05;
+  color: #ffffff;
+  margin: 0 0 1.25rem 0;
+  letter-spacing: -0.01em;
+}
+
+.brand-title em {
+  font-style: italic;
+  color: #d1b47c; /* Warm champagne gold font */
+  font-weight: 400;
+}
+
+.brand-tagline {
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0 0 2rem 0;
+  max-width: 360px;
+}
+
+/* ── Campus Highlights for Students & Teachers ──────────────── */
+.campus-highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+}
+
+.highlight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.highlight-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #93c5fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.highlight-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.highlight-text strong {
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.highlight-text span {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.45;
+}
+
+/* Switch toggle button inside brand pane */
+.brand-switch-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.btn-brand-toggle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 0.45rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.btn-brand-toggle:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(2px);
+}
+
+/* ============================================================
+   RESPONSIVE DESIGN FOR TABLETS & MOBILES
+   ============================================================ */
+@media (max-width: 900px) {
+  .verso-card {
+    height: auto;
+    flex-direction: column;
+    border-radius: 20px;
+  }
+  .verso-card__side--form {
+    width: 100%;
+    padding: 2.5rem 1.75rem;
+  }
+  .verso-card__side--brand {
+    width: 100%;
+    padding: 2.5rem 1.75rem;
+  }
+  .verso-blade {
+    display: none;
+  }
+  .brand-title {
+    font-size: 2.5rem;
+  }
+}
+
+/* ── Keyboard Focus Visibility ─────────────────────────────── */
+.v-btn-submit:focus-visible,
+.v-switch-link:focus-visible,
+.v-link:focus-visible {
+  outline: 2px solid #1d4ed8;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.btn-brand-toggle:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+  border-radius: 9999px;
+}
+
+/* ── Respect Reduced Motion ────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .verso-card,
+  .verso-blade,
+  .card-pane,
+  .brand-showcase,
+  .v-btn-submit,
+  .btn-brand-toggle,
+  .blade-shimmer {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ── Small Laptop / Narrow Desktop ─────────────────────────── */
+@media (max-width: 1050px) {
+  .verso-card__side--form {
+    padding: 2.75rem 3.5rem 2.5rem 2.75rem;
+  }
+  .verso-card__side--brand {
+    padding: 3.25rem 2.5rem 3rem 5.5rem;
+  }
+  .brand-title {
+    font-size: 3rem;
+  }
+  .brand-tagline {
+    max-width: none;
+  }
+}
+
+/* ── Stacked Layout Refinements (extends 900px block) ──────── */
+@media (max-width: 900px) {
+  /* Let the tall signup form flow naturally instead of an inner scrollbar */
+  .verso-card.mode-signup #paneSignup {
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
+  }
+  .brand-switch-hint {
+    flex-wrap: wrap;
+    row-gap: 0.6rem;
+  }
+}
+
+/* ── Phones ────────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .verso-stage {
+    padding: 1.5rem 1rem;
+  }
+  .verso-card {
+    border-radius: 18px;
+  }
+  .verso-card__side--form {
+    padding: 2rem 1.5rem;
+  }
+  .verso-card__side--brand {
+    padding: 2.25rem 1.5rem;
+  }
+  .form-hero {
+    margin-bottom: 1.5rem;
+  }
+  .form-title {
+    font-size: 1.6rem;
+  }
+  .brand-tag {
+    margin-bottom: 1rem;
+  }
+  .brand-title {
+    font-size: 2.1rem;
+  }
+  .brand-tagline {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+  }
+  /* Single-column form rows so fields stay usable on narrow screens */
+  .v-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .v-role-tab {
+    font-size: 0.7rem;
+    gap: 0.3rem;
+  }
+  .campus-highlights {
+    margin-bottom: 1.5rem;
+  }
+}

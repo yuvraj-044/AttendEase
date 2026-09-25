@@ -70,10 +70,12 @@ class CustomLoginForm(AuthenticationForm):
         'class': 'form-control',
         'placeholder': 'Username or PCCOE email',
         'autofocus': True,
+        'id': 'id_login_username',
     }))
     password = forms.CharField(widget=forms.PasswordInput(attrs={
         'class': 'form-control',
         'placeholder': 'Password',
+        'id': 'id_login_password',
     }))
 
     def clean_username(self):

@@ -17,6 +17,15 @@ from .backends import get_supabase_client
 logger = logging.getLogger(__name__)
 
 
+def _build_auth_context(login_form, register_form, mode):
+    """Helper to build template context with both forms."""
+    return {
+        'login_form': login_form,
+        'register_form': register_form,
+        'mode': mode,
+    }
+
+
 def register_view(request):
     """
     Handle user registration.
@@ -28,11 +37,13 @@ def register_view(request):
     if request.user.is_authenticated:
         return redirect('users:redirect_dashboard')
 
+    login_form = CustomLoginForm()
+
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password1']
+        register_form = CustomUserCreationForm(request.POST)
+        if register_form.is_valid():
+            email = register_form.cleaned_data['email']
+            password = register_form.cleaned_data['password1']
 
             # Step 1: Create user in Supabase Auth
             supabase_user_created = False
@@ -57,7 +68,7 @@ def register_view(request):
                 logger.warning('Supabase not configured. Creating local-only user.')
 
             # Step 2: Create Django user regardless of Supabase result
-            user = form.save()
+            user = register_form.save()
 
             # Step 3: Log the user in via Django
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
@@ -69,9 +80,10 @@ def register_view(request):
         else:
             messages.error(request, 'Please correct the errors below.')
     else:
-        form = CustomUserCreationForm()
+        register_form = CustomUserCreationForm()
 
-    return render(request, 'users/register.html', {'form': form})
+    ctx = _build_auth_context(login_form, register_form, mode='register')
+    return render(request, 'users/auth.html', ctx)
 
 
 def login_view(request):
@@ -82,19 +94,22 @@ def login_view(request):
     if request.user.is_authenticated:
         return redirect('users:redirect_dashboard')
 
+    register_form = CustomUserCreationForm()
+
     if request.method == 'POST':
-        form = CustomLoginForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
+        login_form = CustomLoginForm(request, data=request.POST)
+        if login_form.is_valid():
+            user = login_form.get_user()
             login(request, user)
             messages.success(request, f'Welcome back, {user.first_name or user.username}!')
             return redirect('users:redirect_dashboard')
         else:
             messages.error(request, 'Invalid username or password.')
     else:
-        form = CustomLoginForm()
+        login_form = CustomLoginForm()
 
-    return render(request, 'users/login.html', {'form': form})
+    ctx = _build_auth_context(login_form, register_form, mode='login')
+    return render(request, 'users/auth.html', ctx)
 
 
 def logout_view(request):

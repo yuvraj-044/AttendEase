@@ -1,0 +1,421 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if mode == 'register' %}Create Account{% else %}Sign In{% endif %} — AttendEase{% endblock %}
+
+{% block extra_css %}
+<!-- Google Fonts: Cormorant Garamond, Plus Jakarta Sans & Outfit -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/auth-animated.css' %}">
+{% endblock %}
+
+{% block auth_content %}
+<div class="verso-stage">
+
+  <!-- Floating background ambient orbs -->
+  <div class="stage-glow stage-glow--1"></div>
+  <div class="stage-glow stage-glow--2"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       THE CENTRAL VERSO CARD
+       ═══════════════════════════════════════════════════════════ -->
+  <div class="verso-card-container">
+    <div class="verso-card" id="versoCard">
+
+      <!-- ─── RECTO SIDE: Left White Form Area ─── -->
+      <div class="verso-card__side verso-card__side--form">
+        
+        <!-- SIGN IN FORM PANE (Visible by default) -->
+        <div class="card-pane" id="paneSignin">
+          <div class="form-hero">
+            <h2 class="form-title">Sign in</h2>
+            <div class="title-bar"></div>
+          </div>
+
+          <form method="POST" action="{% url 'users:login' %}" autocomplete="on" id="loginForm">
+            {% csrf_token %}
+
+            <div class="v-field">
+              <input type="text" name="username" id="id_username" class="v-input" placeholder="Username or email" required autocomplete="username">
+              <span class="v-field-icon"><i class="bi bi-person"></i></span>
+            </div>
+            {% if login_form.username.errors %}
+              <div class="v-error"><i class="bi bi-exclamation-circle"></i> {{ login_form.username.errors.0 }}</div>
+            {% endif %}
+
+            <div class="v-field">
+              <input type="password" name="password" id="id_password" class="v-input" placeholder="Password" required autocomplete="current-password">
+              <button type="button" class="v-field-action" onclick="togglePassword('id_password', this)" title="Toggle password view">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+            {% if login_form.password.errors %}
+              <div class="v-error"><i class="bi bi-exclamation-circle"></i> {{ login_form.password.errors.0 }}</div>
+            {% endif %}
+
+            {% if login_form.non_field_errors %}
+              <div class="v-error v-error--block">
+                <i class="bi bi-exclamation-triangle"></i> {{ login_form.non_field_errors.0 }}
+              </div>
+            {% endif %}
+
+            <div class="v-meta-row">
+              <label class="v-checkbox-label">
+                <input type="checkbox" name="remember_me" class="v-checkbox" checked>
+                <span class="v-checkbox-custom"></span>
+                <span>Keep me signed in</span>
+              </label>
+              <a href="javascript:void(0)" class="v-link" onclick="alert('Please contact your department teacher or administrator to reset your PCCOE credentials.')">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="v-btn-submit">
+              <span>Sign in</span>
+            </button>
+          </form>
+
+          <div class="v-switch-cta">
+            <span>New to AttendEase?</span>
+            <a href="javascript:void(0)" class="v-switch-link" onclick="setAuthMode('signup')">Create an account</a>
+          </div>
+        </div>
+
+        <!-- SIGN UP FORM PANE (Visible when in signup mode) -->
+        <div class="card-pane" id="paneSignup">
+          <div class="form-hero">
+            <h2 class="form-title">Create account</h2>
+            <div class="title-bar"></div>
+          </div>
+
+          <form method="POST" action="{% url 'users:register' %}" autocomplete="on" id="registerForm">
+            {% csrf_token %}
+
+            <!-- Role Selector Pill Tabs -->
+            <div class="v-role-tabs">
+              <label class="v-role-tab active" data-role="student" onclick="selectRole('student')">
+                <i class="bi bi-mortarboard"></i> Student
+              </label>
+              <label class="v-role-tab" data-role="teacher" onclick="selectRole('teacher')">
+                <i class="bi bi-person-badge"></i> Teacher
+              </label>
+              <label class="v-role-tab" data-role="coordinator" onclick="selectRole('coordinator')">
+                <i class="bi bi-megaphone"></i> Coordinator
+              </label>
+            </div>
+
+            <!-- Hidden actual select for Django Form -->
+            <div style="display:none;">
+              {{ register_form.role }}
+            </div>
+
+            <!-- Name row -->
+            <div class="v-row">
+              <div class="v-field">
+                <input type="text" name="first_name" id="id_first_name" class="v-input" placeholder="First name" required>
+                <span class="v-field-icon"><i class="bi bi-person"></i></span>
+              </div>
+              <div class="v-field">
+                <input type="text" name="last_name" id="id_last_name" class="v-input" placeholder="Last name" required>
+                <span class="v-field-icon"><i class="bi bi-person"></i></span>
+              </div>
+            </div>
+
+            <!-- Username & Email -->
+            <div class="v-row">
+              <div class="v-field">
+                <input type="text" name="username" id="id_reg_username" class="v-input" placeholder="Username" required>
+                <span class="v-field-icon"><i class="bi bi-at"></i></span>
+              </div>
+              <div class="v-field">
+                <input type="email" name="email" id="id_reg_email" class="v-input" placeholder="name@pccoepune.org" required>
+                <span class="v-field-icon"><i class="bi bi-envelope"></i></span>
+              </div>
+            </div>
+
+            <!-- Division & Grade -->
+            <div class="v-row" id="academicRow">
+              <div class="v-field" id="divField">
+                <select name="division" id="id_division" class="v-select">
+                  <option value="">Select Division</option>
+                  <option value="A">Division A</option>
+                  <option value="B">Division B</option>
+                  <option value="C">Division C</option>
+                  <option value="D">Division D</option>
+                  <option value="E">Division E</option>
+                  <option value="F">Division F</option>
+                  <option value="G">Division G</option>
+                  <option value="H">Division H</option>
+                  <option value="I">Division I</option>
+                  <option value="J">Division J</option>
+                  <option value="K">Division K</option>
+                  <option value="L">Division L</option>
+                  <option value="M">Division M</option>
+                  <option value="N">Division N</option>
+                  <option value="O">Division O</option>
+                  <option value="P">Division P</option>
+                </select>
+                <span class="v-field-icon"><i class="bi bi-grid"></i></span>
+              </div>
+
+              <div class="v-field" id="gradeField">
+                <select name="grade" id="id_grade" class="v-select">
+                  <option value="">Select Year</option>
+                  <option value="FY">F.Y (First Year)</option>
+                  <option value="SY">S.Y (Second Year)</option>
+                  <option value="TY">T.Y (Third Year)</option>
+                  <option value="BTECH">B.Tech (Final Year)</option>
+                </select>
+                <span class="v-field-icon"><i class="bi bi-calendar3"></i></span>
+              </div>
+            </div>
+
+            <!-- ID & Department -->
+            <div class="v-row">
+              <div class="v-field">
+                <input type="text" name="student_id" id="id_student_id" class="v-input" placeholder="Roll / PRN Number">
+                <span class="v-field-icon"><i class="bi bi-card-text"></i></span>
+              </div>
+              <div class="v-field">
+                <input type="text" name="department" id="id_department" class="v-input" placeholder="e.g. Computer Engg">
+                <span class="v-field-icon"><i class="bi bi-building"></i></span>
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="v-field">
+              <input type="tel" name="phone" id="id_phone" class="v-input" placeholder="Phone number (optional)">
+              <span class="v-field-icon"><i class="bi bi-phone"></i></span>
+            </div>
+
+            <!-- Passwords -->
+            <div class="v-row">
+              <div class="v-field">
+                <input type="password" name="password1" id="id_password1" class="v-input" placeholder="Password" required>
+                <button type="button" class="v-field-action" onclick="togglePassword('id_password1', this)">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+              <div class="v-field">
+                <input type="password" name="password2" id="id_password2" class="v-input" placeholder="Confirm password" required>
+                <button type="button" class="v-field-action" onclick="togglePassword('id_password2', this)">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            {% if register_form.errors %}
+              <div class="v-error v-error--block">
+                <i class="bi bi-exclamation-triangle"></i> Please check and correct the highlighted fields.
+              </div>
+            {% endif %}
+
+            <button type="submit" class="v-btn-submit v-btn-submit--signup">
+              <span>Create Account</span>
+            </button>
+          </form>
+
+          <div class="v-switch-cta">
+            <span>Already have an account?</span>
+            <a href="javascript:void(0)" class="v-switch-link" onclick="setAuthMode('signin')">Sign in</a>
+          </div>
+        </div>
+
+      </div><!-- /.verso-card__side--form -->
+
+
+      <!-- ─── SLIDING DIAGONAL BLADE (The Skewed Cut) ─── -->
+      <div class="verso-blade" id="versoBlade">
+        <div class="blade-shimmer"></div>
+      </div>
+
+
+      <!-- ─── VERSO SIDE: Right Elegant Deep Blue Showcase ─── -->
+      <div class="verso-card__side verso-card__side--brand">
+        
+        <!-- BRAND CONTENT FOR SIGN IN (Shown when user is looking at sign in) -->
+        <div class="brand-showcase" id="brandShowcaseSignin">
+          <div class="brand-tag">ATTENDEASE</div>
+          
+          <h1 class="brand-title">
+            Welcome<br>
+            <em>back.</em>
+          </h1>
+          
+          <p class="brand-tagline">
+            Your attendance ledger, duty-leave approvals, and college events are exactly where you left them.
+          </p>
+
+          <!-- Rich Stakeholder Feature Points for Students & Teachers -->
+          <div class="campus-highlights">
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="bi bi-mortarboard-fill"></i></div>
+              <div class="highlight-text">
+                <strong>For Students</strong>
+                <span>One-tap event check-ins & automatic OD attendance credits.</span>
+              </div>
+            </div>
+
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="bi bi-check2-circle"></i></div>
+              <div class="highlight-text">
+                <strong>For Class Teachers</strong>
+                <span>Instant paperless approvals with digital certificate proof.</span>
+              </div>
+            </div>
+
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="bi bi-shield-check"></i></div>
+              <div class="highlight-text">
+                <strong>PCCOE Verified</strong>
+                <span>Direct ERP integration for academic compliance.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="brand-switch-hint">
+            <span>Switch to register:</span>
+            <button type="button" class="btn-brand-toggle" onclick="setAuthMode('signup')">
+              <span>Create Account</span>
+              <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- BRAND CONTENT FOR SIGN UP (Shown when user is looking at signup) -->
+        <div class="brand-showcase" id="brandShowcaseSignup">
+          <div class="brand-tag">JOIN CAMPUS</div>
+          
+          <h1 class="brand-title">
+            Join the<br>
+            <em>network.</em>
+          </h1>
+          
+          <p class="brand-tagline">
+            Say goodbye to physical paper slips and missed attendance penalties during campus events.
+          </p>
+
+          <div class="campus-highlights">
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="bi bi-calendar-event"></i></div>
+              <div class="highlight-text">
+                <strong>College Hackathons & Fests</strong>
+                <span>Auto-tagged to your department's attendance records.</span>
+              </div>
+            </div>
+
+            <div class="highlight-item">
+              <div class="highlight-icon"><i class="bi bi-lock-fill"></i></div>
+              <div class="highlight-text">
+                <strong>Official Email Guard</strong>
+                <span>Secured exclusively for @pccoepune.org community.</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="brand-switch-hint">
+            <span>Already registered?</span>
+            <button type="button" class="btn-brand-toggle" onclick="setAuthMode('signin')">
+              <span>Sign In</span>
+              <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+      </div><!-- /.verso-card__side--brand -->
+
+    </div><!-- /.verso-card -->
+
+  </div><!-- /.verso-card-container -->
+
+</div><!-- /.verso-stage -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/**
+ * VERSO Card Mode Switcher
+ * Moves the diagonal blade and toggles the active panes
+ */
+function setAuthMode(mode) {
+  const card = document.getElementById('versoCard');
+  if (!card) return;
+
+  if (mode === 'signup') {
+    card.classList.add('mode-signup');
+  } else {
+    card.classList.remove('mode-signup');
+  }
+}
+
+/**
+ * Toggle Password Visibility
+ */
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (icon) {
+      icon.classList.remove('bi-eye');
+      icon.classList.add('bi-eye-slash');
+    }
+  } else {
+    input.type = 'password';
+    if (icon) {
+      icon.classList.remove('bi-eye-slash');
+      icon.classList.add('bi-eye');
+    }
+  }
+}
+
+/**
+ * Role Selector in Sign-Up Form
+ */
+function selectRole(roleValue) {
+  // Update hidden Django form select
+  const select = document.getElementById('id_role');
+  if (select) {
+    select.value = roleValue;
+  }
+
+  // Update tabs active styling
+  const tabs = document.querySelectorAll('.v-role-tab');
+  tabs.forEach(tab => {
+    if (tab.getAttribute('data-role') === roleValue) {
+      tab.classList.add('active');
+    } else {
+      tab.classList.remove('active');
+    }
+  });
+
+  // Dynamic field visibility for Coordinator vs Student/Teacher
+  const academicRow = document.getElementById('academicRow');
+  const gradeField = document.getElementById('gradeField');
+  const studentIdInput = document.getElementById('id_student_id');
+
+  if (roleValue === 'coordinator') {
+    if (academicRow) academicRow.style.display = 'none';
+    if (studentIdInput) studentIdInput.placeholder = 'Coordinator / Staff ID';
+  } else if (roleValue === 'teacher') {
+    if (academicRow) academicRow.style.display = 'grid';
+    if (gradeField) gradeField.style.display = 'none';
+    if (studentIdInput) studentIdInput.placeholder = 'Faculty Employee ID';
+  } else {
+    if (academicRow) academicRow.style.display = 'grid';
+    if (gradeField) gradeField.style.display = '';
+    if (studentIdInput) studentIdInput.placeholder = 'Roll / PRN Number';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  // If server passed mode='register' or has register form errors, show signup
+  {% if mode == 'register' or register_form.errors %}
+    setAuthMode('signup');
+  {% endif %}
+
+  // Sync role selector initially
+  selectRole('student');
+});
+</script>
+{% endblock %}
