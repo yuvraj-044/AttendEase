@@ -75,8 +75,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database — Supabase PostgreSQL (or SQLite for local fallback)
-if os.environ.get('USE_SQLITE', 'False').lower() in ('true', '1'):
+# Database — SQLite by default for local development; PostgreSQL elsewhere.
+# Set USE_SQLITE=False and provide Supabase database settings to use PostgreSQL.
+use_sqlite_default = (
+    'True'
+    if os.environ.get('DJANGO_SETTINGS_MODULE') == 'config.settings.local'
+    else 'False'
+)
+if os.environ.get('USE_SQLITE', use_sqlite_default).lower() in ('true', '1'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -136,6 +142,17 @@ LOGOUT_REDIRECT_URL = 'users:login'
 # Supabase configuration
 SUPABASE_URL = os.environ.get('SUPABASE_URL', '')
 SUPABASE_ANON_KEY = os.environ.get('SUPABASE_ANON_KEY', '')
+
+# Firebase web config is public client configuration; Admin credentials stay server-side.
+FIREBASE_PROJECT_ID = os.environ.get('FIREBASE_PROJECT_ID', '')
+FIREBASE_ADMIN_CREDENTIALS = os.environ.get('FIREBASE_ADMIN_CREDENTIALS', '')
+FIREBASE_WEB_CONFIG = {
+    'apiKey': os.environ.get('FIREBASE_API_KEY', ''),
+    'authDomain': os.environ.get('FIREBASE_AUTH_DOMAIN', ''),
+    'projectId': FIREBASE_PROJECT_ID,
+    'appId': os.environ.get('FIREBASE_APP_ID', ''),
+    'messagingSenderId': os.environ.get('FIREBASE_MESSAGING_SENDER_ID', ''),
+}
 
 # Messages framework — Bootstrap 5 alert class mapping
 from django.contrib.messages import constants as messages

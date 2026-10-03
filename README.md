@@ -80,28 +80,35 @@ Copy `.env.example` to create your local `.env`:
 cp .env.example .env
 ```
 
-Open `.env` and fill in your Supabase credentials:
+For a local SQLite run, the copied template is ready for `migrate` and `runserver`; Supabase credentials are not needed. To use Supabase instead, edit `.env` with the real project values:
 
 ```env
 # Django
 DJANGO_SECRET_KEY=your-secure-secret-key
 DJANGO_DEBUG=True
 
+# Select Supabase PostgreSQL instead of local SQLite
+USE_SQLITE=False
+
 # Supabase Database (PostgreSQL)
-# Found in Supabase Dashboard → Settings → Database
-SUPABASE_DB_HOST=db.yourprojectref.supabase.co
+# Copy the connection details from Supabase Dashboard → Project Settings → Database
+SUPABASE_DB_HOST=your-database-host
 SUPABASE_DB_PORT=5432
 SUPABASE_DB_NAME=postgres
 SUPABASE_DB_USER=postgres
 SUPABASE_DB_PASSWORD=your_actual_db_password
 
-# Supabase API
-# Found in Supabase Dashboard → Settings → API
+# Supabase Auth
+# Copy the project URL and anon/publishable key from Supabase Dashboard → Project Settings → API
 SUPABASE_URL=https://yourprojectref.supabase.co
 SUPABASE_ANON_KEY=your_actual_anon_key
 ```
 
-> **Connection Note:** If connecting from an IPv4-only network, use the **Transaction Pooler** host and port (`6543` or `5432`) provided in your Supabase Database Settings.
+Use one database mode: keep `USE_SQLITE=True` for local SQLite, or set it to `False` and fill in every PostgreSQL value from your Supabase project's connection details. If a direct connection is unavailable on your network, use the pooler connection details shown in the dashboard; do not guess its hostname, port, or username. Do not commit `.env` or put a database password or service-role key in client-side code. The application expects the public anon/publishable key for its Supabase Auth client.
+
+**Authentication:** Email/password remains available through the current Django/Supabase flow. Google sign-in uses Firebase Authentication. In Firebase Console, enable the Google provider and allow `localhost` under **Authentication → Settings → Authorized domains**. Add `FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_PROJECT_ID`, `FIREBASE_APP_ID`, and `FIREBASE_MESSAGING_SENDER_ID` from your Firebase Web app to `.env`. Google sign-ins are restricted to verified `@pccoepune.org` addresses; first-time sign-ins create a Student account with profile fields initially blank, and existing accounts are matched by email. Complete new users' class/profile details in Django Admin as needed.
+
+The Django server also needs Firebase Admin credentials to verify ID tokens. Download a service-account key from **Firebase Project settings → Service accounts**, store the JSON outside the repository, and set `FIREBASE_ADMIN_CREDENTIALS` in `.env` to its absolute path. Never commit or share that private key. `firebase-admin` is installed from `requirements/base.txt`.
 
 ### 3. Install Dependencies
 
@@ -111,7 +118,7 @@ pip3 install -r requirements/local.txt
 
 ### 4. Apply Database Migrations
 
-Run migrations to create all required schema tables in Supabase PostgreSQL:
+Run migrations to create all required schema tables in the selected database (SQLite locally by default, or Supabase PostgreSQL when `USE_SQLITE=False`):
 
 ```bash
 python3 manage.py migrate
@@ -209,12 +216,19 @@ AttendEase/
 | :--- | :--- | :--- |
 | `DJANGO_SECRET_KEY` | Unique Django secret cryptographic key | `django-insecure-...` |
 | `DJANGO_DEBUG` | Enable debug mode (`True` for dev, `False` for prod) | `True` |
+| `USE_SQLITE` | Use local SQLite instead of Supabase PostgreSQL | `True` |
 | `SUPABASE_DB_HOST` | Supabase PostgreSQL server hostname | `db.xxxx.supabase.co` |
 | `SUPABASE_DB_PORT` | PostgreSQL connection port | `5432` or `6543` |
 | `SUPABASE_DB_NAME` | PostgreSQL database name | `postgres` |
 | `SUPABASE_DB_USER` | PostgreSQL username | `postgres` |
 | `SUPABASE_DB_PASSWORD` | PostgreSQL database user password | `••••••••` |
 | `SUPABASE_URL` | Supabase project API URL | `https://xxxx.supabase.co` |
+| `FIREBASE_API_KEY` | Firebase Web app API key | `your-firebase-web-api-key` |
+| `FIREBASE_AUTH_DOMAIN` | Firebase Web app auth domain | `your-project.firebaseapp.com` |
+| `FIREBASE_PROJECT_ID` | Firebase project ID | `your-project-id` |
+| `FIREBASE_APP_ID` | Firebase Web app ID | `1:...:web:...` |
+| `FIREBASE_MESSAGING_SENDER_ID` | Firebase Web app sender ID | `123456789` |
+| `FIREBASE_ADMIN_CREDENTIALS` | Server-only path to Firebase Admin service-account JSON | `/secure/path/service-account.json` |
 | `SUPABASE_ANON_KEY` | Supabase public anonymous API key | `eyJhbGciOi...` |
 
 ---
