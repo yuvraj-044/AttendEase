@@ -74,6 +74,12 @@
             </button>
           </form>
 
+          {% if firebase_web_config.apiKey and firebase_web_config.authDomain and firebase_web_config.projectId and firebase_web_config.appId %}
+            <button type="button" class="v-btn-submit google-signin-button">
+              <span>Continue with Google</span>
+            </button>
+          {% endif %}
+
           <div class="v-switch-cta">
             <span>New to AttendEase?</span>
             <a href="javascript:void(0)" class="v-switch-link" onclick="setAuthMode('signup')">Create an account</a>
@@ -214,6 +220,12 @@
             </button>
           </form>
 
+          {% if firebase_web_config.apiKey and firebase_web_config.authDomain and firebase_web_config.projectId and firebase_web_config.appId %}
+            <button type="button" class="v-btn-submit google-signin-button">
+              <span>Continue with Google</span>
+            </button>
+          {% endif %}
+
           <div class="v-switch-cta">
             <span>Already have an account?</span>
             <a href="javascript:void(0)" class="v-switch-link" onclick="setAuthMode('signin')">Sign in</a>
@@ -331,6 +343,54 @@
 {% endblock %}
 
 {% block extra_js %}
+{% if firebase_web_config.apiKey and firebase_web_config.authDomain and firebase_web_config.projectId and firebase_web_config.appId %}
+{{ firebase_web_config|json_script:"firebase-web-config" }}
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+
+  const firebaseConfig = JSON.parse(document.getElementById('firebase-web-config').textContent);
+  const firebaseApp = initializeApp(firebaseConfig);
+  const firebaseAuth = getAuth(firebaseApp);
+  const googleProvider = new GoogleAuthProvider();
+  const signInButtons = document.querySelectorAll('.google-signin-button');
+
+  signInButtons.forEach((button) => {
+    button.addEventListener('click', async () => {
+      const originalText = button.textContent.trim();
+      signInButtons.forEach((item) => { item.disabled = true; });
+      button.textContent = 'Connecting to Google…';
+      try {
+        const credential = await signInWithPopup(firebaseAuth, googleProvider);
+        const idToken = await credential.user.getIdToken();
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const response = await fetch("{% url 'users:firebase_login' %}", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+          },
+          body: JSON.stringify({ idToken }),
+        });
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.error || 'Google sign-in failed.');
+        }
+        window.location.assign(result.redirect_url);
+      } catch (error) {
+        const message = error.code === 'auth/popup-closed-by-user'
+          ? 'Google sign-in was cancelled.'
+          : (error.message || 'Google sign-in failed.');
+        window.alert(message);
+        signInButtons.forEach((item) => {
+          item.disabled = false;
+          item.textContent = originalText;
+        });
+      }
+    });
+  });
+</script>
+{% endif %}
 <script>
 /**
  * VERSO Card Mode Switcher

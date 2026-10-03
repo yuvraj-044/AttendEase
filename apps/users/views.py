@@ -7,14 +7,27 @@ Logout clears both Django session and Supabase session.
 """
 
 import logging
+import hashlib
+import json
+from pathlib import Path
+from django.conf import settings
+from django.db import transaction
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from django.views.decorators.http import require_POST
 from django.contrib import messages
-from .forms import CustomUserCreationForm, CustomLoginForm
+from .forms import ALLOWED_EMAIL_DOMAIN, CustomUserCreationForm, CustomLoginForm
 from .backends import get_supabase_client
+from .models import CustomUser
 
 logger = logging.getLogger(__name__)
+
+
+class FirebaseConfigurationError(Exception):
+    pass
 
 
 def _build_auth_context(login_form, register_form, mode):
@@ -23,7 +36,107 @@ def _build_auth_context(login_form, register_form, mode):
         'login_form': login_form,
         'register_form': register_form,
         'mode': mode,
+        'firebase_web_config': settings.FIREBASE_WEB_CONFIG,
     }
+
+
+def _firebase_admin_app():
+    """Initialize Firebase Admin once using a local service account or ADC."""
+    try:
+        import firebase_admin
+        from firebase_admin import credentials
+    except ImportError as exc:
+        raise FirebaseConfigurationError('firebase-admin is not installed.') from exc
+
+    app_name = 'attendease'
+    try:
+        return firebase_admin.get_app(app_name)
+    except ValueError:
+        if not settings.FIREBASE_PROJECT_ID:
+            raise FirebaseConfigurationError('FIREBASE_PROJECT_ID is not configured.')
+
+        try:
+            credential_path = settings.FIREBASE_ADMIN_CREDENTIALS
+            credential = (
+                credentials.Certificate(Path(credential_path))
+                if credential_path
+                else credentials.ApplicationDefault()
+            )
+            return firebase_admin.initialize_app(
+                credential,
+                {'projectId': settings.FIREBASE_PROJECT_ID},
+                name=app_name,
+            )
+        except Exception as exc:
+            raise FirebaseConfigurationError('Firebase Admin credentials are invalid or unavailable.') from exc
+
+
+@require_POST
+def firebase_login_view(request):
+    """Verify a Firebase ID token, then sign in or provision the matching Django user."""
+    try:
+        payload = json.loads(request.body)
+    except (json.JSONDecodeError, UnicodeDecodeError):
+        return JsonResponse({'error': 'Invalid sign-in request.'}, status=400)
+
+    id_token = payload.get('idToken') if isinstance(payload, dict) else None
+    if not isinstance(id_token, str) or not id_token:
+        return JsonResponse({'error': 'Google sign-in token is missing.'}, status=400)
+
+    try:
+        from firebase_admin import auth
+        admin_app = _firebase_admin_app()
+    except FirebaseConfigurationError:
+        logger.exception('Firebase Admin is not configured.')
+        return JsonResponse({'error': 'Google sign-in is not configured on this server.'}, status=503)
+
+    try:
+        claims = auth.verify_id_token(id_token, app=admin_app, check_revoked=True)
+    except Exception:
+        logger.warning('Firebase ID token verification failed.')
+        return JsonResponse({'error': 'Google sign-in token is invalid or expired.'}, status=401)
+
+    email = (claims.get('email') or '').strip().lower()
+    if not claims.get('email_verified') or not email:
+        return JsonResponse({'error': 'Use a verified Google account to sign in.'}, status=403)
+    if email.rsplit('@', 1)[-1] != ALLOWED_EMAIL_DOMAIN:
+        return JsonResponse(
+            {'error': f'Use your @{ALLOWED_EMAIL_DOMAIN} Google account.'},
+            status=403,
+        )
+
+    display_name = (claims.get('name') or '').strip().split(maxsplit=1)
+    first_name = display_name[0] if display_name else ''
+    last_name = display_name[1] if len(display_name) > 1 else ''
+    username = f"firebase_{hashlib.sha256(claims['uid'].encode()).hexdigest()[:20]}"
+
+    with transaction.atomic():
+        user = CustomUser.objects.filter(email__iexact=email).first()
+        if user is None:
+            user = CustomUser(
+                username=username,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                role=CustomUser.Role.STUDENT,
+            )
+            user.set_unusable_password()
+            user.save()
+        elif not user.is_active:
+            return JsonResponse({'error': 'This account is disabled. Contact an administrator.'}, status=403)
+        else:
+            changed_fields = []
+            if not user.first_name and first_name:
+                user.first_name = first_name
+                changed_fields.append('first_name')
+            if not user.last_name and last_name:
+                user.last_name = last_name
+                changed_fields.append('last_name')
+            if changed_fields:
+                user.save(update_fields=changed_fields)
+
+    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    return JsonResponse({'redirect_url': reverse(settings.LOGIN_REDIRECT_URL)})
 
 
 def register_view(request):
