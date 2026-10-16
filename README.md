@@ -72,7 +72,26 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 2. Configure Environment Variables
+### 2. Build the React dashboards
+
+The role-based React dashboards are served by Django at `/app/`. Build their static
+assets before running Django:
+
+```bash
+npm install
+npm run build
+```
+
+After a frontend source change, run `npm run build` again so Django serves the
+updated files from `static/ui/`.
+
+The frontend uses the signed-in Django session and CSRF protection. Its JSON
+endpoints are `/api/session/`, `/api/dashboard/`, `/api/events/`, and
+`/api/requests/` (with per-request review and attendance actions under
+`/api/requests/<id>/`). Dashboard data and mutations are restricted by the
+authenticated user's role, event ownership, and class division.
+
+### 3. Configure Environment Variables
 
 Copy `.env.example` to create your local `.env`:
 
@@ -110,13 +129,13 @@ Use one database mode: keep `USE_SQLITE=True` for local SQLite, or set it to `Fa
 
 The Django server also needs Firebase Admin credentials to verify ID tokens. Download a service-account key from **Firebase Project settings → Service accounts**, store the JSON outside the repository, and set `FIREBASE_ADMIN_CREDENTIALS` in `.env` to its absolute path. Never commit or share that private key. `firebase-admin` is installed from `requirements/base.txt`.
 
-### 3. Install Dependencies
+### 4. Install Dependencies
 
 ```bash
 pip3 install -r requirements/local.txt
 ```
 
-### 4. Apply Database Migrations
+### 5. Apply Database Migrations
 
 Run migrations to create all required schema tables in the selected database (SQLite locally by default, or Supabase PostgreSQL when `USE_SQLITE=False`):
 
@@ -124,13 +143,13 @@ Run migrations to create all required schema tables in the selected database (SQ
 python3 manage.py migrate
 ```
 
-### 5. Create an Administrator Superuser
+### 6. Create an Administrator Superuser
 
 ```bash
 python3 manage.py createsuperuser
 ```
 
-### 6. Start the Development Server
+### 7. Start the Development Server
 
 ```bash
 # Run using the helper script
@@ -141,6 +160,27 @@ python3 manage.py runserver
 ```
 
 Open your browser and navigate to **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**.
+After signing in, students, coordinators, and class teachers are routed to the
+dashboard matching the role on their account. The React app uses Django's
+session authentication and role-scoped JSON endpoints under `/api/`.
+
+For local demos, set `DEBUG=True` and run:
+
+```bash
+python3 manage.py setup_demo_accounts
+```
+
+This command creates sample events and requests plus three demo logins:
+
+| Role | Username | Password |
+| --- | --- | --- |
+| Student | `demo.student` | `StudentDemo123!` |
+| Event coordinator | `demo.coordinator` | `CoordinatorDemo123!` |
+| Class teacher | `demo.teacher` | `TeacherDemo123!` |
+
+The sign-in page shows one-click demo buttons in development only. The quick
+login endpoint is disabled whenever `DEBUG=False`; do not use these demo
+credentials for real or production accounts.
 
 ---
 

@@ -2,7 +2,8 @@ import json
 from unittest.mock import patch
 
 from django.contrib.sessions.backends.db import SessionStore
-from django.test import RequestFactory, TestCase
+from django.test import RequestFactory, TestCase, override_settings
+from django.urls import reverse
 
 from .models import CustomUser
 from .views import firebase_login_view
@@ -72,3 +73,43 @@ class FirebaseLoginViewTests(TestCase):
         response = firebase_login_view(request)
 
         self.assertEqual(response.status_code, 400)
+
+
+class DemoLoginViewTests(TestCase):
+    def setUp(self):
+        self.student = CustomUser.objects.create_user(
+            username='demo.student',
+            password='StudentDemo123!',
+            role=CustomUser.Role.STUDENT,
+            first_name='Demo',
+        )
+
+    @override_settings(DEBUG=True)
+    def test_demo_login_uses_only_the_seeded_account_and_creates_session(self):
+        response = self.client.post(
+            reverse('users:demo_login', args=['student']),
+            follow=False,
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('react_app'))
+        self.assertEqual(int(self.client.session['_auth_user_id']), self.student.pk)
+
+    @override_settings(DEBUG=False)
+    def test_demo_login_is_disabled_outside_development(self):
+        response = self.client.post(reverse('users:demo_login', args=['student']))
+
+        self.assertEqual(response.status_code, 404)
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+    @override_settings(DEBUG=True)
+    def test_demo_login_rejects_unknown_role(self):
+        response = self.client.post(reverse('users:demo_login', args=['admin']))
+
+        self.assertEqual(response.status_code, 404)
+
+    @override_settings(DEBUG=True)
+    def test_demo_login_requires_post(self):
+        response = self.client.get(reverse('users:demo_login', args=['student']))
+
+        self.assertEqual(response.status_code, 405)

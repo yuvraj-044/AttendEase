@@ -36,6 +36,7 @@ def _build_auth_context(login_form, register_form, mode):
         'login_form': login_form,
         'register_form': register_form,
         'mode': mode,
+        'demo_login_enabled': settings.DEBUG,
         'firebase_web_config': settings.FIREBASE_WEB_CONFIG,
     }
 
@@ -225,6 +226,31 @@ def login_view(request):
     return render(request, 'users/auth.html', ctx)
 
 
+@require_POST
+def demo_login_view(request, role):
+    """Quick sign-in for pre-seeded demo accounts on development servers only."""
+    if not settings.DEBUG:
+        return JsonResponse({'error': 'Demo sign-in is disabled.'}, status=404)
+
+    demo_accounts = {
+        CustomUser.Role.STUDENT: 'demo.student',
+        CustomUser.Role.COORDINATOR: 'demo.coordinator',
+        CustomUser.Role.TEACHER: 'demo.teacher',
+    }
+    username = demo_accounts.get(role)
+    if not username:
+        return JsonResponse({'error': 'Unknown demo account.'}, status=404)
+
+    user = CustomUser.objects.filter(username=username, role=role, is_active=True).first()
+    if user is None:
+        messages.error(request, 'Demo accounts are not set up yet. Run the demo setup command first.')
+        return redirect('users:login')
+
+    login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    messages.success(request, f'Signed in as demo {user.get_role_display()}.')
+    return redirect('react_app')
+
+
 def logout_view(request):
     """
     Log out the user from both Django and Supabase.
@@ -250,11 +276,11 @@ def redirect_dashboard(request):
     """
     user = request.user
     if user.is_student:
-        return redirect('attendance:student_dashboard')
+        return redirect('react_app')
     elif user.is_coordinator:
-        return redirect('attendance:coordinator_dashboard')
+        return redirect('react_app')
     elif user.is_teacher:
-        return redirect('attendance:teacher_dashboard')
+        return redirect('react_app')
     else:
         # Fallback for superusers or unknown roles
-        return redirect('attendance:student_dashboard')
+        return redirect('react_app')
