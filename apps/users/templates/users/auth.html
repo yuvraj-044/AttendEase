@@ -74,6 +74,33 @@
             </button>
           </form>
 
+          {% if demo_login_enabled %}
+            <div class="demo-access">
+              <div class="demo-access-heading">
+                <span class="demo-access-indicator"></span>
+                <div>
+                  <strong>Explore a demo dashboard</strong>
+                  <small>One-click access to each role</small>
+                </div>
+              </div>
+              <div class="demo-access-actions">
+                <form method="post" action="{% url 'users:demo_login' 'student' %}">
+                  {% csrf_token %}
+                  <button type="submit"><i class="bi bi-mortarboard"></i><span>Student</span><i class="bi bi-arrow-right"></i></button>
+                </form>
+                <form method="post" action="{% url 'users:demo_login' 'coordinator' %}">
+                  {% csrf_token %}
+                  <button type="submit"><i class="bi bi-megaphone"></i><span>Coordinator</span><i class="bi bi-arrow-right"></i></button>
+                </form>
+                <form method="post" action="{% url 'users:demo_login' 'teacher' %}">
+                  {% csrf_token %}
+                  <button type="submit"><i class="bi bi-person-badge"></i><span>Class teacher</span><i class="bi bi-arrow-right"></i></button>
+                </form>
+              </div>
+              <p class="demo-access-note">Demo sign-in is available only in development.</p>
+            </div>
+          {% endif %}
+
           {% if firebase_web_config.apiKey and firebase_web_config.authDomain and firebase_web_config.projectId and firebase_web_config.appId %}
             <button type="button" class="v-btn-submit google-signin-button">
               <span>Continue with Google</span>

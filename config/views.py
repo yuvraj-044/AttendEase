@@ -41,3 +41,8 @@ def about(request):
         'stack': stack,
         'team': team,
     })
+
+
+def react_app(request):
+    """Serve the compiled React dashboards."""
+    return render(request, 'react_app.html')
