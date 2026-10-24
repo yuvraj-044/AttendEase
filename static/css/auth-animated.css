@@ -110,7 +110,7 @@
 .verso-card__side--form {
   width: 48%;
   background: var(--v-form-bg);
-  padding: 3.5rem 3.5rem 2.5rem 3.5rem;
+  padding: 2.25rem 2.75rem 2rem 2.75rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -212,7 +212,7 @@
 
 /* ── Form Heading like Reference ────────────────────────────── */
 .form-hero {
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
 }
 
 .form-title {
@@ -234,7 +234,7 @@
 /* ── Input Fields matching Screenshot Style ─────────────────── */
 .v-field {
   position: relative;
-  margin-bottom: 1.15rem;
+  margin-bottom: 0.85rem;
   width: 100%;
 }
 
@@ -331,8 +331,8 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  row-gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  row-gap: 0.35rem;
+  margin-bottom: 0.95rem;
   font-size: 0.8rem;
 }
 
@@ -365,7 +365,7 @@
 /* ── Pill Submit Button (Identical to Screenshot) ────────────── */
 .v-btn-submit {
   width: 100%;
-  padding: 0.8rem 1.5rem;
+  padding: 0.72rem 1.5rem;
   background: var(--v-btn-primary);
   color: #ffffff;
   border: none;
@@ -376,7 +376,7 @@
   cursor: pointer;
   box-shadow: 0 6px 18px rgba(16, 59, 117, 0.4);
   transition: all 0.2s ease;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .v-btn-submit:hover {
@@ -400,6 +400,7 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  margin-top: 0.85rem;
 }
 
 .v-switch-link {
@@ -722,10 +723,44 @@
   background: #65b67a;
   box-shadow: 0 0 0 4px #65b67a20;
 }
+/* Development-only one-click demo account choices */
+.demo-access {
+  margin-top: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #e2e8e4;
+  border-radius: 12px;
+  background: #f8faf9;
+}
+.demo-access-heading {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .45rem;
+}
+.demo-access-heading strong {
+  color: #24312b;
+  font-size: .76rem;
+  font-weight: 700;
+  display: block;
+}
+.demo-access-heading small {
+  color: #84908a;
+  font-size: .64rem;
+  display: block;
+  line-height: 1;
+}
+.demo-access-indicator {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #65b67a;
+  box-shadow: 0 0 0 3px #65b67a20;
+}
 .demo-access-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: .55rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .35rem;
 }
 .demo-access-actions form {
   min-width: 0;
@@ -733,78 +768,35 @@
 }
 .demo-access-actions button {
   width: 100%;
-  min-height: 50px;
-  padding: .5rem .65rem;
+  min-height: 38px;
+  padding: .4rem .25rem;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  gap: .5rem;
+  justify-content: center;
+  gap: .3rem;
   border: 1px solid #e2e8e4;
-  border-radius: 10px;
-  color: #24312b;
+  border-radius: 8px;
+  color: #334155;
   background: #fff;
   font: inherit;
-  transition: all .18s ease;
+  font-size: .72rem;
+  font-weight: 600;
+  transition: all .15s ease;
   cursor: pointer;
+  white-space: nowrap;
 }
 .demo-access-actions button:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
   border-color: #65b67a;
-  background: #f4faf5;
-  box-shadow: 0 4px 10px rgba(101, 182, 122, 0.15);
+  background: #f1f7f1;
+  color: #1e3a29;
 }
-.demo-access-actions .demo-btn-text {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  line-height: 1.15;
-  flex: 1;
-  min-width: 0;
+.demo-access-actions button > i {
+  color: #477a56;
+  font-size: .8rem;
 }
-.demo-access-actions .demo-role {
-  font-size: .74rem;
-  font-weight: 700;
-  color: #24312b;
-}
-.demo-access-actions .demo-name {
-  font-size: .62rem;
-  color: #6b7c73;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-}
-.demo-access-actions button > i:first-child {
-  font-size: 1.1rem;
-  color: #3b7c53;
-  flex: 0 0 auto;
-}
-.demo-access-actions button > i:last-child {
-  color: #a8b8ae;
-  font-size: .65rem;
-  margin-left: auto;
-  transition: transform .18s ease;
-}
-.demo-access-actions button:hover > i:last-child {
-  transform: translateX(2px);
-  color: #3b7c53;
-}
-.demo-access-note {
-  margin: .7rem 0 0;
-  color: #909a94;
-  font-size: .65rem;
-  text-align: center;
-}
-@media (max-width: 420px) {
+@media (max-width: 520px) {
   .demo-access-actions {
-    grid-template-columns: 1fr;
-  }
-  .demo-access-actions button {
-    justify-content: flex-start;
-  }
-  .demo-access-actions button > i:last-child {
-    margin-left: auto;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
