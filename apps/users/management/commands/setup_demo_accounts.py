@@ -12,22 +12,33 @@ from users.models import CustomUser
 
 
 DEMO_ACCOUNTS = {
-    'demo.student': {
+    'demo.student1': {
         'password': 'StudentDemo123!',
-        'first_name': 'Riya',
-        'last_name': 'Patel',
-        'email': 'demo.student@example.invalid',
+        'first_name': 'Aarav',
+        'last_name': 'Sharma',
+        'email': 'demo.student1@pccoepune.org',
         'role': CustomUser.Role.STUDENT,
         'division': 'A',
         'grade': CustomUser.Grade.TY,
         'student_id': 'TYCS-301',
         'department': 'Computer Science',
     },
+    'demo.student2': {
+        'password': 'StudentDemo123!',
+        'first_name': 'Riya',
+        'last_name': 'Patel',
+        'email': 'demo.student2@pccoepune.org',
+        'role': CustomUser.Role.STUDENT,
+        'division': 'A',
+        'grade': CustomUser.Grade.TY,
+        'student_id': 'TYCS-302',
+        'department': 'Computer Science',
+    },
     'demo.coordinator': {
         'password': 'CoordinatorDemo123!',
         'first_name': 'Anil',
         'last_name': 'Iyer',
-        'email': 'demo.coordinator@example.invalid',
+        'email': 'demo.coordinator@pccoepune.org',
         'role': CustomUser.Role.COORDINATOR,
         'department': 'Student Activities',
     },
@@ -35,7 +46,7 @@ DEMO_ACCOUNTS = {
         'password': 'TeacherDemo123!',
         'first_name': 'Neha',
         'last_name': 'Kulkarni',
-        'email': 'demo.teacher@example.invalid',
+        'email': 'demo.teacher@pccoepune.org',
         'role': CustomUser.Role.TEACHER,
         'division': 'A',
         'department': 'Computer Science',
@@ -44,7 +55,7 @@ DEMO_ACCOUNTS = {
 
 
 class Command(BaseCommand):
-    help = 'Create or refresh the three local AttendEase demo accounts and dashboard data.'
+    help = 'Create or refresh the 4 local AttendEase demo accounts and dashboard data.'
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -66,10 +77,29 @@ class Command(BaseCommand):
             user.save()
             users[username] = user
 
+        # Compatibility alias: ensure demo.student also exists and points to Student 1
+        demo_student, _created = CustomUser.objects.get_or_create(
+            username='demo.student',
+            defaults={
+                'first_name': 'Aarav',
+                'last_name': 'Sharma',
+                'email': 'demo.student@pccoepune.org',
+                'role': CustomUser.Role.STUDENT,
+                'division': 'A',
+                'grade': CustomUser.Grade.TY,
+                'student_id': 'TYCS-301',
+                'department': 'Computer Science',
+            },
+        )
+        demo_student.set_password('StudentDemo123!')
+        demo_student.is_active = True
+        demo_student.save()
+
         today = date.today()
         coordinator = users['demo.coordinator']
         teacher = users['demo.teacher']
-        student = users['demo.student']
+        student1 = users['demo.student1']
+        student2 = users['demo.student2']
 
         events = {}
         event_rows = [
@@ -91,15 +121,13 @@ class Command(BaseCommand):
             )
             events[name] = event
 
-        students = [
-            (student, 'TYCS-301'),
-            (self._student('demo.aarav', 'Aarav', 'Mehta', 'TYCS-318', 'A'), 'TYCS-318'),
-            (self._student('demo.diya', 'Diya', 'Shah', 'TYCS-327', 'A'), 'TYCS-327'),
-        ]
         request_rows = [
-            (students[0][0], events['Campus Innovation Hackathon'], 'pending', 'Presenting our capstone prototype.'),
-            (students[1][0], events['Campus Innovation Hackathon'], 'coordinator_approved', 'Participating as a team member.'),
-            (students[2][0], events['AI Builders Workshop'], 'teacher_approved', 'Building skills in applied AI.'),
+            # Student 1 requests
+            (student1, events['Campus Innovation Hackathon'], 'pending', 'Presenting our capstone prototype.'),
+            (student1, events['AI Builders Workshop'], 'coordinator_approved', 'Attending key AI builder sessions.'),
+            # Student 2 requests
+            (student2, events['Campus Innovation Hackathon'], 'coordinator_approved', 'Participating as hackathon developer.'),
+            (student2, events['AI Builders Workshop'], 'teacher_approved', 'Building hands-on skills in applied AI.'),
         ]
         for request_student, event, status, reason in request_rows:
             defaults = {
@@ -118,14 +146,15 @@ class Command(BaseCommand):
                 defaults=defaults,
             )
 
-        external = AttendanceRequest.objects.filter(
-            student=student,
+        # Open / external event requests
+        external_student1 = AttendanceRequest.objects.filter(
+            student=student1,
             event_type=AttendanceRequest.EventType.OPEN,
             external_event_name='Designverse Meetup',
         ).first()
-        if external is None:
+        if external_student1 is None:
             AttendanceRequest.objects.create(
-                student=student,
+                student=student1,
                 event_type=AttendanceRequest.EventType.OPEN,
                 status=AttendanceRequest.Status.TEACHER_APPROVED,
                 reason='Sharing a student design project at the meetup.',
@@ -139,16 +168,16 @@ class Command(BaseCommand):
                 is_attended=True,
             )
         else:
-            external.status = AttendanceRequest.Status.TEACHER_APPROVED
-            external.teacher = teacher
-            external.teacher_remarks = 'Approved for participation.'
-            external.is_attended = True
-            external.save()
+            external_student1.status = AttendanceRequest.Status.TEACHER_APPROVED
+            external_student1.teacher = teacher
+            external_student1.teacher_remarks = 'Approved for participation.'
+            external_student1.is_attended = True
+            external_student1.save()
 
-        self.stdout.write(self.style.SUCCESS('Demo accounts are ready:'))
+        self.stdout.write(self.style.SUCCESS('4 Demo accounts are ready:'))
         for username, values in DEMO_ACCOUNTS.items():
-            self.stdout.write(f"  {values['role']}: {username} / {values['password']}")
-        self.stdout.write('Sample requests and events were created for all three dashboards.')
+            self.stdout.write(f"  {values['role']} ({values['first_name']} {values['last_name']}): {username} / {values['password']}")
+        self.stdout.write('Sample requests and events were created for student, coordinator, and teacher dashboards.')
 
     @staticmethod
     def _student(username, first_name, last_name, student_id, division):

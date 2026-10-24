@@ -724,8 +724,8 @@
 }
 .demo-access-actions {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: .5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .55rem;
 }
 .demo-access-actions form {
   min-width: 0;
@@ -733,32 +733,63 @@
 }
 .demo-access-actions button {
   width: 100%;
-  min-height: 48px;
-  padding: .55rem .6rem;
+  min-height: 50px;
+  padding: .5rem .65rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: .4rem;
+  justify-content: flex-start;
+  gap: .5rem;
   border: 1px solid #e2e8e4;
-  border-radius: 9px;
-  color: #41544a;
+  border-radius: 10px;
+  color: #24312b;
   background: #fff;
   font: inherit;
-  font-size: .68rem;
-  font-weight: 700;
-  transition: border-color .15s, background .15s, transform .15s;
+  transition: all .18s ease;
+  cursor: pointer;
 }
 .demo-access-actions button:hover {
-  transform: translateY(-1px);
-  border-color: #a8c4af;
-  background: #f1f7f1;
+  transform: translateY(-2px);
+  border-color: #65b67a;
+  background: #f4faf5;
+  box-shadow: 0 4px 10px rgba(101, 182, 122, 0.15);
+}
+.demo-access-actions .demo-btn-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.15;
+  flex: 1;
+  min-width: 0;
+}
+.demo-access-actions .demo-role {
+  font-size: .74rem;
+  font-weight: 700;
+  color: #24312b;
+}
+.demo-access-actions .demo-name {
+  font-size: .62rem;
+  color: #6b7c73;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 .demo-access-actions button > i:first-child {
-  color: #70967a;
+  font-size: 1.1rem;
+  color: #3b7c53;
+  flex: 0 0 auto;
 }
 .demo-access-actions button > i:last-child {
-  color: #9ba8a0;
-  font-size: .62rem;
+  color: #a8b8ae;
+  font-size: .65rem;
+  margin-left: auto;
+  transition: transform .18s ease;
+}
+.demo-access-actions button:hover > i:last-child {
+  transform: translateX(2px);
+  color: #3b7c53;
 }
 .demo-access-note {
   margin: .7rem 0 0;

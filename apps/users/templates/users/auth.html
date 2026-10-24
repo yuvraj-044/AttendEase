@@ -79,25 +79,57 @@
               <div class="demo-access-heading">
                 <span class="demo-access-indicator"></span>
                 <div>
-                  <strong>Explore a demo dashboard</strong>
-                  <small>One-click access to each role</small>
+                  <strong>Demo Accounts (1-Click Login)</strong>
+                  <small>Instant access for all 4 roles</small>
                 </div>
               </div>
               <div class="demo-access-actions">
-                <form method="post" action="{% url 'users:demo_login' 'student' %}">
+                <form method="post" action="{% url 'users:demo_login' 'student1' %}">
                   {% csrf_token %}
-                  <button type="submit"><i class="bi bi-mortarboard"></i><span>Student</span><i class="bi bi-arrow-right"></i></button>
+                  <button type="submit" title="Sign in as Student 1: Aarav Sharma (Div A)">
+                    <i class="bi bi-mortarboard"></i>
+                    <div class="demo-btn-text">
+                      <span class="demo-role">Student 1</span>
+                      <span class="demo-name">Aarav (Div A)</span>
+                    </div>
+                    <i class="bi bi-arrow-right"></i>
+                  </button>
+                </form>
+                <form method="post" action="{% url 'users:demo_login' 'student2' %}">
+                  {% csrf_token %}
+                  <button type="submit" title="Sign in as Student 2: Riya Patel (Div A)">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    <div class="demo-btn-text">
+                      <span class="demo-role">Student 2</span>
+                      <span class="demo-name">Riya (Div A)</span>
+                    </div>
+                    <i class="bi bi-arrow-right"></i>
+                  </button>
                 </form>
                 <form method="post" action="{% url 'users:demo_login' 'coordinator' %}">
                   {% csrf_token %}
-                  <button type="submit"><i class="bi bi-megaphone"></i><span>Coordinator</span><i class="bi bi-arrow-right"></i></button>
+                  <button type="submit" title="Sign in as Coordinator: Prof. Anil Iyer">
+                    <i class="bi bi-megaphone"></i>
+                    <div class="demo-btn-text">
+                      <span class="demo-role">Coordinator</span>
+                      <span class="demo-name">Prof. Anil</span>
+                    </div>
+                    <i class="bi bi-arrow-right"></i>
+                  </button>
                 </form>
                 <form method="post" action="{% url 'users:demo_login' 'teacher' %}">
                   {% csrf_token %}
-                  <button type="submit"><i class="bi bi-person-badge"></i><span>Class teacher</span><i class="bi bi-arrow-right"></i></button>
+                  <button type="submit" title="Sign in as Class Teacher: Dr. Neha Kulkarni (Div A)">
+                    <i class="bi bi-person-badge"></i>
+                    <div class="demo-btn-text">
+                      <span class="demo-role">Class Teacher</span>
+                      <span class="demo-name">Dr. Neha (Div A)</span>
+                    </div>
+                    <i class="bi bi-arrow-right"></i>
+                  </button>
                 </form>
               </div>
-              <p class="demo-access-note">Demo sign-in is available only in development.</p>
+              <p class="demo-access-note">Click any account to sign in immediately without entering credentials.</p>
             </div>
           {% endif %}
 

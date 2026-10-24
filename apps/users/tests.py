@@ -77,27 +77,61 @@ class FirebaseLoginViewTests(TestCase):
 
 class DemoLoginViewTests(TestCase):
     def setUp(self):
-        self.student = CustomUser.objects.create_user(
-            username='demo.student',
+        self.student1 = CustomUser.objects.create_user(
+            username='demo.student1',
             password='StudentDemo123!',
             role=CustomUser.Role.STUDENT,
-            first_name='Demo',
+            first_name='Aarav',
+            last_name='Sharma',
+            email='demo.student1@pccoepune.org',
+        )
+        self.student2 = CustomUser.objects.create_user(
+            username='demo.student2',
+            password='StudentDemo123!',
+            role=CustomUser.Role.STUDENT,
+            first_name='Riya',
+            last_name='Patel',
+            email='demo.student2@pccoepune.org',
+        )
+        self.coordinator = CustomUser.objects.create_user(
+            username='demo.coordinator',
+            password='CoordinatorDemo123!',
+            role=CustomUser.Role.COORDINATOR,
+            first_name='Anil',
+            last_name='Iyer',
+            email='demo.coordinator@pccoepune.org',
+        )
+        self.teacher = CustomUser.objects.create_user(
+            username='demo.teacher',
+            password='TeacherDemo123!',
+            role=CustomUser.Role.TEACHER,
+            first_name='Neha',
+            last_name='Kulkarni',
+            email='demo.teacher@pccoepune.org',
         )
 
     @override_settings(DEBUG=True)
-    def test_demo_login_uses_only_the_seeded_account_and_creates_session(self):
-        response = self.client.post(
-            reverse('users:demo_login', args=['student']),
-            follow=False,
-        )
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse('react_app'))
-        self.assertEqual(int(self.client.session['_auth_user_id']), self.student.pk)
+    def test_demo_login_for_all_four_accounts(self):
+        cases = [
+            ('student1', self.student1),
+            ('student2', self.student2),
+            ('coordinator', self.coordinator),
+            ('teacher', self.teacher),
+            ('student', self.student1),
+        ]
+        for role_arg, user_obj in cases:
+            with self.subTest(role=role_arg):
+                response = self.client.post(
+                    reverse('users:demo_login', args=[role_arg]),
+                    follow=False,
+                )
+                self.assertEqual(response.status_code, 302)
+                self.assertEqual(response.url, reverse('react_app'))
+                self.assertEqual(int(self.client.session['_auth_user_id']), user_obj.pk)
 
     @override_settings(DEBUG=False)
     def test_demo_login_is_disabled_outside_development(self):
-        response = self.client.post(reverse('users:demo_login', args=['student']))
+        response = self.client.post(reverse('users:demo_login', args=['student1']))
 
         self.assertEqual(response.status_code, 404)
         self.assertNotIn('_auth_user_id', self.client.session)
@@ -110,6 +144,7 @@ class DemoLoginViewTests(TestCase):
 
     @override_settings(DEBUG=True)
     def test_demo_login_requires_post(self):
-        response = self.client.get(reverse('users:demo_login', args=['student']))
+        response = self.client.get(reverse('users:demo_login', args=['student1']))
 
         self.assertEqual(response.status_code, 405)
+

@@ -233,7 +233,12 @@ def demo_login_view(request, role):
         return JsonResponse({'error': 'Demo sign-in is disabled.'}, status=404)
 
     demo_accounts = {
-        CustomUser.Role.STUDENT: 'demo.student',
+        'student': 'demo.student1',
+        'student1': 'demo.student1',
+        'student2': 'demo.student2',
+        'coordinator': 'demo.coordinator',
+        'teacher': 'demo.teacher',
+        CustomUser.Role.STUDENT: 'demo.student1',
         CustomUser.Role.COORDINATOR: 'demo.coordinator',
         CustomUser.Role.TEACHER: 'demo.teacher',
     }
@@ -241,13 +246,26 @@ def demo_login_view(request, role):
     if not username:
         return JsonResponse({'error': 'Unknown demo account.'}, status=404)
 
-    user = CustomUser.objects.filter(username=username, role=role, is_active=True).first()
+    user = CustomUser.objects.filter(username=username, is_active=True).first()
+    if user is None and role in ('student', CustomUser.Role.STUDENT):
+        user = CustomUser.objects.filter(username='demo.student', is_active=True).first()
+
+    if user is None:
+        try:
+            from django.core.management import call_command
+            call_command('setup_demo_accounts')
+            user = CustomUser.objects.filter(username=username, is_active=True).first()
+            if user is None and role in ('student', CustomUser.Role.STUDENT):
+                user = CustomUser.objects.filter(username='demo.student', is_active=True).first()
+        except Exception as exc:
+            logger.warning('Could not auto-seed demo accounts: %s', exc)
+
     if user is None:
         messages.error(request, 'Demo accounts are not set up yet. Run the demo setup command first.')
         return redirect('users:login')
 
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-    messages.success(request, f'Signed in as demo {user.get_role_display()}.')
+    messages.success(request, f'Signed in as demo {user.get_full_name() or user.get_role_display()}.')
     return redirect('react_app')
 
 
